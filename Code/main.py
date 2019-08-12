@@ -36,6 +36,9 @@ model.add(layersDense(64, activation='relu'))
 model.add(layers.Dense(64, activation='relu'))
 # Add a softmax layer with 10 with 10 output units:
 model.add(layers.Dense(10, activation='softmax'))
+# Mouse Click Function
+def jump():
+        pyautogui.press("space")
 
 
 Play_Button = compute_icon_type(Play_button)
