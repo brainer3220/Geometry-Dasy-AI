@@ -1,4 +1,4 @@
-# 소개
+# Introduce
 
 ## What?
 본 Prozect는 Geomatry Dash의 AI를 만드는 것입니다.
