@@ -2,7 +2,6 @@ import tensorflow as tf
 import pyautogui as pag
 import mss, cv2
 import numpy as np
-import pag
 
 
 Play_Button = [361, 228]    #첫 시작 버튼
