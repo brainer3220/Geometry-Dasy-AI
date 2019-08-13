@@ -26,6 +26,7 @@ model.add(layers.Dense(10, activation='softmax'))
 def jump():
         pag.press("space")
 
+# Click to Start Button
 def Click_Start():
         pag.moveTo(417, 257)    # X and y coordinates of the start button
         pag.mouseDown()
