@@ -3,18 +3,8 @@ import pyautogui as pag
 import mss, cv2
 import numpy as np
 
-
-Play_Button = [361, 228]    #첫 시작 버튼
-next_Button = [980, 245]    # 게임내 목록 다음 버튼
-Previous = [42, 245]        #게임내 모곡 이전 버튼
-
-result = 0  #결과 반환 값, 추후 무슨 일을 할것인지 반환
 from PIL import Image
 
-while True:
-    x, y = pag.position()
-    position_str = 'X: ' + str(x) + 'Y: '+ str(y)
-    print(position_str)
 
     def compute_icon_type(img):
         mean = nm.mean(img, axis=(0, 1))
