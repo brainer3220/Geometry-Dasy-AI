@@ -41,6 +41,10 @@ model.add(layers.Dense(10, activation='softmax'))
 def jump():
         pag.press("space")
 
+def Click_Start():
+        pag.moveTo(417, 257)    # X and y coordinates of the start button
+        pag.mouseDown()
+        pag.mouseUp()
 
 Play_Button = compute_icon_type(Play_button)
 
