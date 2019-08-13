@@ -37,6 +37,7 @@ while True:
         with mss.mss() as sct:
                 Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
 
-                cv2.imshow('Game_Src', Game_Scr)
-                cv2.waitKey(0)
+                # Below is a test to see if you are capturing the screen of the emulator.
+                # cv2.imshow('Game_Src', Game_Scr)
+                # cv2.waitKey(0)
 
