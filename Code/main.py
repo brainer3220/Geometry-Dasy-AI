@@ -22,8 +22,21 @@ def Click_Start():
 
 # Function to get resolution.
 # Test it when you bring the emulator's resolution coordinates.
+# while True:
+#    x, y = pag.position()
+#    position_str = 'X: ' + str(x) + 'Y: ' + str(y)
+#    bring_window()
+#    print(position_str)
+
+# Full resolution of the emulator
+Game_Scr_pos = {'left': 16, 'top': 54, 'height': 483, 'width': 789}
+
+# Where to click the button on the emulator.
+Game_Src_Click_pos = [379, 283]
 while True:
-   x, y = pag.position()
-   position_str = 'X: ' + str(x) + 'Y: ' + str(y)
-   print(position_str)
+        with mss.mss() as sct:
+                Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
+
+                cv2.imshow('Game_Src', Game_Scr)
+                cv2.waitKey(0)
 
