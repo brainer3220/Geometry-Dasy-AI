@@ -17,6 +17,21 @@ def Click_Start():
         pag.mouseDown()
         pag.mouseUp()
 
+def bring_window():
+        time.sleep(0.5)
+        apple = """
+        tell application "BlueStacks"
+        activate
+        end tell
+        """
+def Convolution(img):
+        kernel = tf.constant([
+                [
+                        [[1.0, 2.0]]
+                ]
+        ])
+        conv2d = tf.nn.conv2d(img, kernel, strides=[1, 1, 1, 1], padding='VALID')
+        return conv2d
 
 
 
