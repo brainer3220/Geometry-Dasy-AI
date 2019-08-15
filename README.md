@@ -13,7 +13,6 @@
 * mss
 * pag
 * BlueStack과 같은 Android Emulator
-  * Emulator의 해상도는 960 * 540(qHD)입니다.
 
 ### GeometryDash_AI Directory
     ├─Code
