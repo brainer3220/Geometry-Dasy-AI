@@ -25,14 +25,14 @@ def bring_window():
         end tell
         """
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[200, 200, 3, 3], stddev=0.1))
+        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
         sess = tf.Session()
         with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
-            img = img.astype('float32')
-            conv2d = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 1, 1, 1], padding='SAME')  # + Bias1
-            conv2d = sess.run(conv2d)
-        return conv2d
+                sess.run(tf.global_variables_initializer())
+                img = img.astype('float32')
+                conv2d = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 25, 25, 1], padding='VALID')  # + Bias1
+                conv2d = sess.run(conv2d)
+                return conv2d
 
 
 
@@ -57,3 +57,5 @@ while True:
                 # cv2.imshow('Game_Src', Game_Scr)
                 # cv2.waitKey(0)
 
+                Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+                print(Convolution(Game_Scr))    # CNN Results
