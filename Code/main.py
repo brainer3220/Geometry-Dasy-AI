@@ -55,9 +55,12 @@ def Convolution(img):
                 img = img.astype('float32')
                 img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
                 img = sess.run(img)
+                img = tf.nn.relu(img)
+                img = sess.run(img)
                 # Max Pooling
-                # img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
-                # sess.run(tf.global_variables_initializer())
+                img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
+                sess.run(tf.global_variables_initializer())
+                # img = sess.run(img)
                 # img = img.eval()
                 return img
 
@@ -98,8 +101,8 @@ while True:
                 Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
 
                 # Below is a test to see if you are capturing the screen of the emulator.
-                # cv2.imshow('Game_Src', Game_Scr)
-                # cv2.waitKey(0)
+                cv2.imshow('Game_Src', Game_Scr)
+                cv2.waitKey(0)
 
                 Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
                 # Game_Scr = Game_Scr.resize((960, 540))
