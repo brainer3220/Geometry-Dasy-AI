@@ -17,7 +17,7 @@ def jump():
 
 # Q Value Function
 def Q_Value(State, Action):
-        reword + (discount * max(Q_next))
+        reword + (Discount * max(Q_next))
         return
 
 # Click to Start Button
@@ -73,7 +73,7 @@ max_Memory = 5000  # Maximum number of game contents remembered
 batch_Size = 50  # Number of data bundles in training
 grid_Size = 10  # Grid size
 nb_States = grid_Size * grid_Size  # State count
-discount = 0.9  # discount Value
+Discount = 0.9  # discount Value
 learning_Rate = 0.2  # Learning_Rate
 
 reword = 0
