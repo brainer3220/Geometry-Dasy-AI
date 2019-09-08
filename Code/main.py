@@ -49,7 +49,6 @@ def average_hash(fname, size = 16):
 
 def Convolution(img):
         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-        sess = tf.Session()
         with tf.Session() as sess:
                 sess.run(tf.global_variables_initializer())
                 img = img.astype('float32')
@@ -59,7 +58,6 @@ def Convolution(img):
                 img = sess.run(img)
                 # Max Pooling
                 img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
-                sess.run(tf.global_variables_initializer())
                 # img = sess.run(img)
                 # img = img.eval()
                 return img
@@ -94,6 +92,8 @@ Game_Scr_pos = {'left': 16, 'top': 54, 'height': 483, 'width': 789}
 
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
+
+sess = tf.Session()
 
 bring_window()
 while True:
