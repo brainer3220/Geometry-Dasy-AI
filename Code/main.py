@@ -49,7 +49,6 @@ def average_hash(fname, size = 16):
 
 def Convolution(img):
         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-        sess = tf.Session()
         with tf.Session() as sess:
                 sess.run(tf.global_variables_initializer())
                 img = img.astype('float32')
@@ -57,11 +56,7 @@ def Convolution(img):
                 img = sess.run(img)
                 img = tf.nn.relu(img)
                 img = sess.run(img)
-                # Max Pooling
-                img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
-                sess.run(tf.global_variables_initializer())
-                # img = sess.run(img)
-                # img = img.eval()
+                Max_Pool(img)
                 return img
 
 epsilon = 1  # Random probability
@@ -76,8 +71,9 @@ nb_States = grid_Size * grid_Size  # State count
 Discount = 0.9  # discount Value
 learning_Rate = 0.2  # Learning_Rate
 
-reword = 0
+Replay_Meomry = 100000
 
+reword = 0
 
 Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
 
