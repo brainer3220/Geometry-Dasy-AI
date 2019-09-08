@@ -100,6 +100,8 @@ Game_Scr_pos = {'left': 16, 'top': 54, 'height': 483, 'width': 789}
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
 
+sess = tf.Session()
+
 bring_window()
 while True:
         with mss.mss() as sct:
