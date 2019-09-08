@@ -103,19 +103,53 @@ while True:
                 # Below is a test to see if you are capturing the screen of the emulator.
                 cv2.imshow('Game_Src', Game_Scr)
                 cv2.waitKey(0)
+def Real_Time():
+        # bring_window()
+        while True:
+                with mss.mss() as sct:
+                        Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
 
-                Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-                # Game_Scr = Game_Scr.resize((960, 540))
-                # Game_Scr = np.ravel(Game_Scr)
+                        # Below is a test to see if you are capturing the screen of the emulator.
+                        cv2.imshow('Game_Src', Game_Scr)
+                        cv2.waitKey(0)
 
-                print(Convolution(Game_Scr))    # CNN Results
+                        Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+                        # Game_Scr = Game_Scr.resize((960, 540))
+                        # Game_Scr = np.ravel(Game_Scr)
 
-                # CNN
-                # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-                # model.add(Conv2D(64, (3, 3), activation='relu'))
-        
+                        # print(Gmd.Convolution(Game_Scr))    # CNN Results
+                        Gmd = DQN(Game_Scr)
+                        print(Gmd.Convolution)
+
+                        # CNN
+                        # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
+                        # model.add(Conv2D(64, (3, 3), activation='relu'))
+                
 
  
 # loss = tf.reduce_mean(tf.square(y-Q_action))
 # Optimizer = tf.trainAdamsOptimizer(learning_rate)
 # training_op = optimizer.minize(loss)
+
+def Vidio_Analyze(Video):
+        Vidcap = cv2.VideoCapture(Video)
+        success,image = Vidcap.read()
+        count = 0
+        while success:
+                cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
+                success,image = Vidcap.read()
+                print('Read a new frame: ', success)
+                count += 1
+
+First_State = input("""If you want to analyze your video?
+press, 1.
+                    
+or real time play game or real time screen analyze.
+press, 2.
+""")
+
+if First_State == 1:
+        Video = input("Please enter a video path and video name.")
+        Vidio_Analyze(Video)
+elif First_State == 2:
+        Real_Time()
