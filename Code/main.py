@@ -58,6 +58,15 @@ def Convolution(img):
                 img = sess.run(img)
                 Max_Pool(img)
                 return img
+# Max Pooling
+def Max_Pool(img):
+        with tf. Session() as sess:
+                img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
+                        sess.run(tf.global_variables_initializer())
+                        # img = sess.run(img)
+                        # img = img.eval()
+                        return img
+
 
 epsilon = 1  # Random probability
 epsilon_Minimum_Value = 0.001  # epsilon의 최소값
