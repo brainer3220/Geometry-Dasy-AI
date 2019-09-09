@@ -79,10 +79,10 @@ def Convolution(img):
 def Max_Pool(img):
         with tf. Session() as sess:
                 img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
-                        sess.run(tf.global_variables_initializer())
-                        # img = sess.run(img)
-                        # img = img.eval()
-                        return img
+                sess.run(tf.global_variables_initializer())
+                img = sess.run(img)
+                img = img.eval()
+                return img
 
 
 
