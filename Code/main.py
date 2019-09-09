@@ -9,6 +9,22 @@ from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
 
+epsilon = 1  # Random probability
+epsilon_Minimum_Value = 0.001  # epsilon의 최소값
+nbActions = 2  # Number of actions (jump, wait)
+epoch = 1001  # Game repeat count
+hidden_Size = 100  # Hidden layer count
+max_Memory = 5000  # Maximum number of game contents remembered
+batch_Size = 50  # Number of data bundles in training
+grid_Size = 10  # Grid size
+nb_States = grid_Size * grid_Size  # State count
+Discount = 0.9  # discount Value
+learning_Rate = 0.2  # Learning_Rate
+
+Replay_Meomry = 100000
+
+reword = 0
+
 # Funciton
 
 # Jump Function
@@ -50,6 +66,7 @@ def average_hash(fname, size = 16):
 def Convolution(img):
         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
         with tf.Session() as sess:
+                Gray_Scale(img)
                 sess.run(tf.global_variables_initializer())
                 img = img.astype('float32')
                 img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
@@ -68,21 +85,7 @@ def Max_Pool(img):
                         return img
 
 
-epsilon = 1  # Random probability
-epsilon_Minimum_Value = 0.001  # epsilon의 최소값
-nbActions = 2  # Number of actions (jump, wait)
-epoch = 1001  # Game repeat count
-hidden_Size = 100  # Hidden layer count
-max_Memory = 5000  # Maximum number of game contents remembered
-batch_Size = 50  # Number of data bundles in training
-grid_Size = 10  # Grid size
-nb_States = grid_Size * grid_Size  # State count
-Discount = 0.9  # discount Value
-learning_Rate = 0.2  # Learning_Rate
 
-Replay_Meomry = 100000
-
-reword = 0
 
 Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
 
@@ -102,13 +105,15 @@ Game_Src_Click_pos = [379, 283]
 
 sess = tf.Session()
 
-bring_window()
-while True:
-        with mss.mss() as sct:
-                Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
+# Gray Scale
+def Gray_Scale(img):
+        tf.image.rgb_to_grayscale(
+        img,
+        name=None
+        )
 
 def Real_Time():
-        # bring_window()
+        bring_window()
         while True:
                 with mss.mss() as sct:
                         Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
@@ -147,7 +152,7 @@ def Vidio_Analyze(Video):
 
 First_State = input("""If you want to analyze your video?
 press, 1.
-                    
+
 or real time play game or real time screen analyze.
 press, 2.
 """)
