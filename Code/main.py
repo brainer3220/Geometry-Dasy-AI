@@ -127,8 +127,8 @@ def Real_Time():
                         # Game_Scr = np.ravel(Game_Scr)
 
                         # print(Gmd.Convolution(Game_Scr))    # CNN Results
-                        # Gmd = Convolution(Game_Scr)
-                        print(Game_Scr.Convolution)
+                        Gmd = Convolution(Game_Scr)
+                        print(Gmd)
 
                         # CNN
                         # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
