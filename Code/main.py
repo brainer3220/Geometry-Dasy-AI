@@ -151,10 +151,10 @@ def Vidio_Analyze(Video):
                 count += 1
 
 First_State = input("""If you want to analyze your video?
-press, 1.
+press 1,
 
-or real time play game or real time screen analyze.
-press, 2.
+or real time play game and real time screen analyze.
+press 2.
 """)
 
 if First_State == 1:
