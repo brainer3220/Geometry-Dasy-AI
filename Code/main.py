@@ -109,8 +109,7 @@ sess = tf.Session()
 def Gray_Scale(img):
         tf.image.rgb_to_grayscale(
         img,
-        name=None
-        )
+        name=None)
 
 def Real_Time():
         bring_window()
@@ -161,4 +160,25 @@ if First_State == 1:
         Video = input("Please enter a video path and video name.")
         Vidio_Analyze(Video)
 elif First_State == 2:
-        Real_Time()
+        Real_Time()elif First_State == 3:
+        i = 0
+        while True:
+                if i == 1624:
+                        break
+                else:
+                        img = "..\Photo\GMD Miss" + str(i)
+                        kernel = tf.Variable(tf.truncated_normal(
+                        shape=[250, 250, 3, 3], stddev=0.1))
+                        with tf.Session() as sess:
+                                Gray_Scale(img)
+                                sess.run(tf.global_variables_initializer())
+                                img = img.astype('float32')
+                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
+                                img = sess.run(img)
+                                img = tf.nn.relu(img)
+                                # img = sess.run(img)
+                                activation_map = sess.run(tf.minimum(tf.nn.relu(img), 255))
+                                Max_Pool(img)
+                                sess = tf.Session()
+                                saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
+                                i += 1
