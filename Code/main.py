@@ -160,7 +160,8 @@ if First_State == 1:
         Video = input("Please enter a video path and video name.")
         Vidio_Analyze(Video)
 elif First_State == 2:
-        Real_Time()elif First_State == 3:
+        Real_Time()
+elif First_State == 3:
         i = 0
         while True:
                 if i == 1624:
