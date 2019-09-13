@@ -167,7 +167,7 @@ elif First_State == 3:
                 if i == 1624:
                         break
                 else:
-                        img = "..\Photo\GMD Miss" + str(i)
+                        img = "..\Photo\GMD Miss\*"
                         kernel = tf.Variable(tf.truncated_normal(
                         shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
