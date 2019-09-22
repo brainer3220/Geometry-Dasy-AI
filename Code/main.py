@@ -168,6 +168,8 @@ elif First_State == 3:
                         break
                 else:
                         img = "..\Photo\GMD Miss\*"
+                        print(img)
+                        # img = float(img)
                         kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
                                 # Gray_Scale(img)
