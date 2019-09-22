@@ -64,7 +64,7 @@ def average_hash(fname, size = 16):
 
 
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
+        kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
         with tf.Session() as sess:
                 Gray_Scale(img)
                 sess.run(tf.global_variables_initializer())
@@ -108,8 +108,9 @@ sess = tf.Session()
 # Gray Scale
 def Gray_Scale(img):
         tf.image.rgb_to_grayscale(
-        img,
-        name=None)
+            img,
+            name=None
+        )
 
 def Real_Time():
         bring_window()
@@ -150,10 +151,13 @@ def Vidio_Analyze(Video):
                 count += 1
 
 First_State = int(input("""If you want to analyze your video?
-press 1,
+press 1.
 
 or real time play game and real time screen analyze.
 press 2.
+
+If learning Geometry Dash Miss image
+Press 3.
 """))
 
 if First_State == 1:
