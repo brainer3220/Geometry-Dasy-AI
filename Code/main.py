@@ -170,7 +170,7 @@ elif First_State == 3:
                         img = "..\Photo\GMD Miss\*"
                         kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
-                                Gray_Scale(img)
+                                # Gray_Scale(img)
                                 sess.run(tf.global_variables_initializer())
                                 img = img.astype('float32')
                                 img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
