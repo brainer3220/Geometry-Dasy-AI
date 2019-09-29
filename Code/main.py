@@ -1,9 +1,10 @@
 import tensorflow as tf
 import pyautogui as pag
-import mss, cv2
+import mss
+import cv2
 import numpy as np
 import time
-import os
+import os, glob
 
 from PIL import Image
 from PIL import ImageGrab
@@ -28,21 +29,29 @@ reword = 0
 # Funciton
 
 # Jump Function
+
+
 def jump():
         pag.press("space")
 
 # Q Value Function
+
+
 def Q_Value(State, Action):
         reword + (Discount * max(Q_next))
         return
 
 # Click to Start Button
+
+
 def Click_Start():
         pag.moveTo(417, 257)    # X and y coordinates of the start button
         pag.mouseDown()
         pag.mouseUp()
 
 # Bring the emulator to the front
+
+
 def bring_window():
         time.sleep(0.5)
         apple = """
@@ -51,7 +60,8 @@ def bring_window():
         end tell
         """
 
-def average_hash(fname, size = 16):
+
+def average_hash(fname, size=16):
         img = Image.open(fname)
         img = img.convert('L')
         img = img.resize((960, 540), Image.ANTIALIAS)
@@ -64,27 +74,30 @@ def average_hash(fname, size = 16):
 
 
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
+        kernel = tf.Variable(tf.truncated_normal(
+            shape=[250, 250, 3, 3], stddev=0.1))
         with tf.Session() as sess:
                 Gray_Scale(img)
                 sess.run(tf.global_variables_initializer())
                 img = img.astype('float32')
-                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
+                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
+                                   1, 30, 30, 1], padding='VALID')  # + Bias1
                 img = sess.run(img)
                 img = tf.nn.relu(img)
                 img = sess.run(img)
                 Max_Pool(img)
                 return img
 # Max Pooling
+
+
 def Max_Pool(img):
         with tf. Session() as sess:
-                img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[1, 25, 25, 3], padding='SAME')
+                img = tf.nn.max_pool(img, ksize=[1, 250, 250, 3], strides=[
+                                     1, 25, 25, 3], padding='SAME')
                 sess.run(tf.global_variables_initializer())
                 img = sess.run(img)
                 img = img.eval()
                 return img
-
-
 
 
 Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
@@ -106,22 +119,26 @@ Game_Src_Click_pos = [379, 283]
 sess = tf.Session()
 
 # Gray Scale
+
+
 def Gray_Scale(img):
         tf.image.rgb_to_grayscale(
-        img,
-        name=None)
+            img,
+            name=None)
+
 
 def Real_Time():
         bring_window()
         while True:
                 with mss.mss() as sct:
-                        Game_Scr = np.array(sct.grab(Game_Scr_pos))[:,:,:3]
+                        Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
                         # Below is a test to see if you are capturing the screen of the emulator.
                         cv2.imshow('Game_Src', Game_Scr)
                         cv2.waitKey(0)
 
-                        Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+                        Game_Scr = cv2.resize(Game_Scr, dsize=(
+                            960, 540), interpolation=cv2.INTER_AREA)
                         # Game_Scr = Game_Scr.resize((960, 540))
                         # Game_Scr = np.ravel(Game_Scr)
 
@@ -132,22 +149,23 @@ def Real_Time():
                         # CNN
                         # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
                         # model.add(Conv2D(64, (3, 3), activation='relu'))
-                
 
- 
+
 # loss = tf.reduce_mean(tf.square(y-Q_action))
 # Optimizer = tf.trainAdamsOptimizer(learning_rate)
 # training_op = optimizer.minize(loss)
 
 def Vidio_Analyze(Video):
         Vidcap = cv2.VideoCapture(Video)
-        success,image = Vidcap.read()
+        success, image = Vidcap.read()
         count = 0
         while success:
-                cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
-                success,image = Vidcap.read()
+                # save frame as JPEG file
+                cv2.imwrite("frame%d.jpg" % count, image)
+                success, image = Vidcap.read()
                 print('Read a new frame: ', success)
                 count += 1
+
 
 First_State = int(input("""If you want to analyze your video?
 press 1.
@@ -170,25 +188,29 @@ elif First_State == 3:
                 if i == 1624:
                         break
                 else:
-                        image_Folder = "..\Photo\GMD Miss\*.png"
-                        GMD_Miss = Image.open(image_Folder)
-                        print(image_Folder)
+                        Img_Folder = "F:\Programing\Geomatry-Dasy-AI\Photo\GMD Miss"
+                        File_List = os.listdir(Img_Folder)
+                        print(File_List)
                         img_list = os.listdir(image_Folder)
-                        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-                        img = "..\Photo\GMD Miss\*"
+                        kernel = tf.Variable(tf.truncated_normal(
+                            shape=[250, 250, 3, 3], stddev=0.1))
                         print(img)
                         # img = float(img)
-                        kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
+                        kernel = tf.Variable(tf.random.truncated_normal(
+                            shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
                                 # Gray_Scale(img)
                                 sess.run(tf.global_variables_initializer())
                                 img = img.astype('float32')
-                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
+                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
+                                                   1, 30, 30, 1], padding='VALID')  # + Bias1
                                 img = sess.run(img)
                                 img = tf.nn.relu(img)
                                 # img = sess.run(img)
-                                activation_map = sess.run(tf.minimum(tf.nn.relu(img), 255))
+                                activation_map = sess.run(
+                                    tf.minimum(tf.nn.relu(img), 255))
                                 Max_Pool(img)
                                 sess = tf.Session()
-                                saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
+                                saver.save(
+                                    sess, '..model\CNN\GMD_Miss\GMDmiss')
                                 i += 1
