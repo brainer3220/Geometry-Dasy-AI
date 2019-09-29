@@ -150,10 +150,13 @@ def Vidio_Analyze(Video):
                 count += 1
 
 First_State = int(input("""If you want to analyze your video?
-press 1,
+press 1.
 
 or real time play game and real time screen analyze.
 press 2.
+
+GMD Miss Learning
+press 3.
 """))
 
 if First_State == 1:
@@ -167,18 +170,15 @@ elif First_State == 3:
                 if i == 1624:
                         break
                 else:
-<<<<<<< HEAD
                         image_Folder = "..\Photo\GMD Miss\*.png"
-                        image_Folder = os.listdir(image_Folder)
+                        GMD_Miss = Image.open(image_Folder)
                         print(image_Folder)
                         img_list = os.listdir(image_Folder)
                         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-=======
                         img = "..\Photo\GMD Miss\*"
                         print(img)
                         # img = float(img)
                         kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
->>>>>>> bc190b16b41b7bca1aae58c2fe8202c5c0f9c111
                         with tf.Session() as sess:
                                 # Gray_Scale(img)
                                 sess.run(tf.global_variables_initializer())
