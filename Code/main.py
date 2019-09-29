@@ -80,7 +80,8 @@ def Convolution(img):
                 Gray_Scale(img)
                 sess.run(tf.global_variables_initializer())
                 img = img.astype('float32')
-                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 30, 30, 1], padding='VALID')  # + Bias1
+                img = tf.nn.conv2d(np.expand_dims(
+                img, 0), kernel, strides=[ 1, 30, 30, 1], padding='VALID', data_format=None, name=None)  # + Bias1
                 img = sess.run(img)
                 img = tf.nn.relu(img)
                 img = sess.run(img)
@@ -92,7 +93,7 @@ def Convolution(img):
 def Max_Pool(img):
         kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
         with tf. Session() as sess:
-                img = tf.nn.max_pool(img, kernel, strides=[1, 25, 25, 3], padding='SAME', name = None)
+                img = tf.nn.max_pool(img, kernel, strides=[1, 25, 25, 3], padding='VALID', name = None)
                 sess.run(tf.global_variables_initializer())
                 img = sess.run(img)
                 img = img.eval()
@@ -181,34 +182,37 @@ if First_State == 1:
 elif First_State == 2:
         Real_Time()
 elif First_State == 3:
+        Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
+        File_List = os.listdir(Img_Folder)
+        print(File_List)
+        img = os.path.join(os.getcwd(), Img_Folder, File_List[0])
+        print(File_List[0])
+        img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+        img = np.array(img)
+        print(img)
+        cv2.imshow('img', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
         i = 0
         while True:
-                Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
-                File_List = os.listdir(Img_Folder)
-                print(File_List)
-                img = os.path.join(os.getcwd(),Img_Folder, File_List[0])
-                print(File_List[0])
-                img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-                img = np.array(img)
-                print(img)
-                cv2.imshow('img', img)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
-                if len(Img_Folder) > i:
-                        img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
-                        img = cv2.imread(img)
-                        kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-                        with tf.Session() as sess:
-                                sess.run(tf.global_variables_initializer())
-                                img = img.astype('float32')
-                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 30, 30, 1], padding='VALID')  # + Bias1
-                                img = sess.run(img)
-                                img = tf.nn.relu(img)
-                                # img = sess.run(img)
-                                activation_map = sess.run(tf.minimum(tf.nn.relu(img), 255))
-                                # Max_Pool(img)
-                                sess = tf.Session()
-                                saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
-                                i += 1
-                else:
-                        break
+            if len(Img_Folder) > i:
+                    img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
+                    img = cv2.imread(img)
+                    kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
+                    with tf.Session() as sess:
+                            sess.run(tf.global_variables_initializer())
+                            img = img.astype('float32')
+                            img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 30, 30, 1], padding='VALID')  # + Bias1
+                            img = sess.run(img)
+                            img = tf.nn.relu(img)
+                            # img = sess.run(img)
+                            activation_map = sess.run(tf.minimum(tf.nn.relu(img), 255))
+                            # Max_Pool(img)
+                            # sess = tf.Session()
+                            # saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
+                            print(img)
+                            print(i)
+                            i += 1
+            else:
+                break
