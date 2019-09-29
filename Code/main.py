@@ -190,14 +190,11 @@ elif First_State == 3:
                 print(File_List)
                 i = 0
                 if len(Img_Folder) > i:
-                        kernel = tf.Variable(tf.truncated_normal(
-                                shape=[250, 250, 3, 3], stddev=0.1))
-                        print(img)
-                        # img = float(img)
+                        cv2.read(File_List[i], IMREAD_GRAYSCALE)
+                        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         kernel = tf.Variable(tf.random.truncated_normal(
                                 shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
-                                # Gray_Scale(img)
                                 sess.run(tf.global_variables_initializer())
                                 img = img.astype('float32')
                                 img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
@@ -209,8 +206,7 @@ elif First_State == 3:
                                         tf.minimum(tf.nn.relu(img), 255))
                                 Max_Pool(img)
                                 sess = tf.Session()
-                                saver.save(
-                                        sess, '..model\CNN\GMD_Miss\GMDmiss')
+                                saver.save(zsess, '..model\CNN\GMD_Miss\GMDmiss')
                                 i += 1
                 else:
                         break
