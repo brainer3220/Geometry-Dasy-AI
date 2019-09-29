@@ -187,7 +187,7 @@ elif First_State == 2:
 elif First_State == 3:
         i = 0
         while True:
-                Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss');
+                Img_Folder = os.path.join(os.getcwd(), 'Photo', 'GMD Miss');
                 File_List = os.listdir(Img_Folder)
                 print(File_List)
                 img = Img_Folder + File_List[0]
