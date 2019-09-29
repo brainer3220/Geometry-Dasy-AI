@@ -4,9 +4,10 @@ import mss
 import cv2
 import numpy as np
 import time
-import os, glob
+import os
+import glob
 
-from matplotlib import pyplot as plt # as는 alias 적용시 사용
+from matplotlib import pyplot as plt  # as는 alias 적용시 사용
 
 from PIL import Image
 from PIL import ImageGrab
@@ -187,22 +188,20 @@ elif First_State == 2:
 elif First_State == 3:
         i = 0
         while True:
-                Img_Folder = os.path.join(os.getcwd(), 'Photo', 'GMD Miss');
+                Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
                 File_List = os.listdir(Img_Folder)
                 print(File_List)
-                img = Img_Folder + File_List[0]
-                print(img)
-                img = cv2.imread(img)
-                # img = Img_Folder + File_List[0]
-                print(img)
+                img = os.path.join(os.getcwd(),Img_Folder, File_List[0])
+                print(File_List[0])
+                img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
                 img = np.array(img)
                 print(img)
                 cv2.imshow('img', img)
-                cv2.waitkey(0)
+                cv2.waitKey(0)
                 cv2.destroyAllWindows()
                 if len(Img_Folder) > i:
-                        img = Img_Folder + File_List[i]
-                        img = cv2.imread(File_List[i], cv2.IMREAD_GRAYSCALE)
+                        img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
+                        img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
                         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
@@ -212,11 +211,10 @@ elif First_State == 3:
                                 img = sess.run(img)
                                 img = tf.nn.relu(img)
                                 # img = sess.run(img)
-                                activation_map = sess.run(
-                                        tf.minimum(tf.nn.relu(img), 255))
+                                activation_map = sess.run(tf.minimum(tf.nn.relu(img), 255))
                                 Max_Pool(img)
                                 sess = tf.Session()
-                                saver.save(zsess, '..model\CNN\GMD_Miss\GMDmiss')
+                                saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
                                 i += 1
                 else:
                         break
