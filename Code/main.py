@@ -6,6 +6,8 @@ import numpy as np
 import time
 import os, glob
 
+from matplotlib import pyplot as plt # as는 alias 적용시 사용
+
 from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
@@ -185,20 +187,23 @@ elif First_State == 2:
 elif First_State == 3:
         i = 0
         while True:
-                Img_Folder = "F:\Programing\Geomatry-Dasy-AI\Photo\GMD Miss"
+                Img_Folder = os.path.join(os.getcwd(), 'Geomatry-Dasy-AI', 'Photo', 'GMD Miss');
                 File_List = os.listdir(Img_Folder)
                 print(File_List)
-                i = 0
+                # img = cv2.imread(Img_Folder+=File_List[0], cv2.IMREAD_GRAYSCALE)
+                plt.imshow(img)
+                plt.xticks([]) # x축 눈금
+                plt.yticks([]) # y축 눈금
+                plt.show()
                 if len(Img_Folder) > i:
-                        cv2.read(File_List[i], IMREAD_GRAYSCALE)
+                        img = Img_Folder + File_List[i]
+                        img = cv2.imread(File_List[i], cv2.IMREAD_GRAYSCALE)
                         kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-                        kernel = tf.Variable(tf.random.truncated_normal(
-                                shape=[250, 250, 3, 3], stddev=0.1))
+                        kernel = tf.Variable(tf.random.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
                                 sess.run(tf.global_variables_initializer())
-                                img = img.astype('float32')
-                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
-                                                        1, 30, 30, 1], padding='VALID')  # + Bias1
+                                # img = img.astype('float32')
+                                img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[1, 30, 30, 1], padding='VALID')  # + Bias1
                                 img = sess.run(img)
                                 img = tf.nn.relu(img)
                                 # img = sess.run(img)
