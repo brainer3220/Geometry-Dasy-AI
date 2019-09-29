@@ -187,14 +187,19 @@ elif First_State == 2:
 elif First_State == 3:
         i = 0
         while True:
-                Img_Folder = os.path.join(os.getcwd(), 'Geomatry-Dasy-AI', 'Photo', 'GMD Miss');
+                Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss');
                 File_List = os.listdir(Img_Folder)
                 print(File_List)
-                # img = cv2.imread(Img_Folder+=File_List[0], cv2.IMREAD_GRAYSCALE)
-                plt.imshow(img)
-                plt.xticks([]) # x축 눈금
-                plt.yticks([]) # y축 눈금
-                plt.show()
+                img = Img_Folder + File_List[0]
+                print(img)
+                img = cv2.imread(img)
+                # img = Img_Folder + File_List[0]
+                print(img)
+                img = np.array(img)
+                print(img)
+                cv2.imshow('img', img)
+                cv2.waitkey(0)
+                cv2.destroyAllWindows()
                 if len(Img_Folder) > i:
                         img = Img_Folder + File_List[i]
                         img = cv2.imread(File_List[i], cv2.IMREAD_GRAYSCALE)
