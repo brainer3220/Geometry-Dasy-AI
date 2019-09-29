@@ -7,8 +7,6 @@ import time
 import os
 import glob
 
-from matplotlib import pyplot as plt  # as는 alias 적용시 사용
-
 from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
