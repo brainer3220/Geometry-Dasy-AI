@@ -185,32 +185,32 @@ elif First_State == 2:
 elif First_State == 3:
         i = 0
         while True:
-                if i == 1624:
-                        break
-                else:
-                        Img_Folder = "F:\Programing\Geomatry-Dasy-AI\Photo\GMD Miss"
-                        File_List = os.listdir(Img_Folder)
-                        print(File_List)
-                        img_list = os.listdir(image_Folder)
+                Img_Folder = "F:\Programing\Geomatry-Dasy-AI\Photo\GMD Miss"
+                File_List = os.listdir(Img_Folder)
+                print(File_List)
+                i = 0
+                if len(Img_Folder) > i:
                         kernel = tf.Variable(tf.truncated_normal(
-                            shape=[250, 250, 3, 3], stddev=0.1))
+                                shape=[250, 250, 3, 3], stddev=0.1))
                         print(img)
                         # img = float(img)
                         kernel = tf.Variable(tf.random.truncated_normal(
-                            shape=[250, 250, 3, 3], stddev=0.1))
+                                shape=[250, 250, 3, 3], stddev=0.1))
                         with tf.Session() as sess:
                                 # Gray_Scale(img)
                                 sess.run(tf.global_variables_initializer())
                                 img = img.astype('float32')
                                 img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
-                                                   1, 30, 30, 1], padding='VALID')  # + Bias1
+                                                        1, 30, 30, 1], padding='VALID')  # + Bias1
                                 img = sess.run(img)
                                 img = tf.nn.relu(img)
                                 # img = sess.run(img)
                                 activation_map = sess.run(
-                                    tf.minimum(tf.nn.relu(img), 255))
+                                        tf.minimum(tf.nn.relu(img), 255))
                                 Max_Pool(img)
                                 sess = tf.Session()
                                 saver.save(
-                                    sess, '..model\CNN\GMD_Miss\GMDmiss')
+                                        sess, '..model\CNN\GMD_Miss\GMDmiss')
                                 i += 1
+                else:
+                        break
