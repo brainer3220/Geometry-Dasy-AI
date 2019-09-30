@@ -23,6 +23,8 @@ nb_States = grid_Size * grid_Size  # State count
 Discount = 0.9  # discount Value
 learning_Rate = 0.2  # Learning_Rate
 
+Reword_List = []
+
 Replay_Meomry = 100000
 
 reword = 0
@@ -32,7 +34,7 @@ reword = 0
 # Jump Function
 
 
-def jump():
+def Jump():
         pag.press("space")
 
 # Q Value Function
@@ -133,17 +135,17 @@ def Real_Time():
                         Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
                         # Below is a test to see if you are capturing the screen of the emulator.
-                        cv2.imshow('Game_Src', Game_Scr)
-                        cv2.waitKey(0)
+                        # cv2.imshow('Game_Src', Game_Scr)
+                        # cv2.waitKey(0)
 
-                        Game_Scr = cv2.resize(Game_Scr, dsize=(
-                            960, 540), interpolation=cv2.INTER_AREA)
+                        Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
                         # Game_Scr = Game_Scr.resize((960, 540))
                         # Game_Scr = np.ravel(Game_Scr)
 
                         # print(Gmd.Convolution(Game_Scr))    # CNN Results
                         Gmd = Convolution(Game_Scr)
                         print(Gmd)
+                        Gmd = tf.Session.run(Gmd)
 
                         # CNN
                         # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
@@ -164,6 +166,23 @@ def Vidio_Analyze(Video):
                 success, image = Vidcap.read()
                 print('Read a new frame: ', success)
                 count += 1
+
+def Game_Play_With_Learning:
+        Play_Time int(input(Press number from Game Time.))
+        while True:
+                Real_Time()
+                Jump()
+
+                if:        # if ended from One of game, up to Play Time.
+                    Play_Time += 1
+
+                if epoch > Play_Time:
+                        break
+def Play_Learning:
+
+
+def Game_Replay():
+    while True:
 
 
 First_State = int(input("""If you want to analyze your video?
