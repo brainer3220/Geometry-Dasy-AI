@@ -88,8 +88,7 @@ def Convolution(img):
 
 
 def Max_Pool(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
-        img = tf.nn.max_pool(img, kernel, strides=[1, 25, 25, 3], padding='VALID', name = None)
+        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
         return img
 
 
@@ -211,8 +210,9 @@ elif First_State == 3:
         # cv2.destroyAllWindows()
 
         i = 0
+        GMD_Miss_Learning = tf.global_variables_initializer
         while True:
-            if len(Img_Folder) > i:
+            if i in range(len(Img_Folder)):
                 img = File_List[i]
                 img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
                 img = cv2.imread(img)
@@ -220,12 +220,15 @@ elif First_State == 3:
                     with tf.name_scope("Convolution"):
                         img = Convolution(img)
                     with tf.name_scope("Relu_Function"):
-                        activation_map = tf.nn.relu(img)
-                    # with tf.name_scope("MaxPool"):
-                    #     Max_Pool(activation_map)
+                        img = tf.nn.relu(img)
+                    with tf.name_scope("MaxPool"):
+                        Max_Pool(img)
                 # saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
                 print(img)
                 print(i)
                 i += 1
             else:
+                cv2.imshow('img', img)
+                cv2.watikey(0)
+                cv2.detroyAllWindows()
                 break
