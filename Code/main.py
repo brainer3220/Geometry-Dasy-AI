@@ -79,16 +79,15 @@ def average_hash(fname, size=16):
 
 
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[250, 250, 3, 3], stddev=0.1))
+        kernel = tf.Variable(tf.truncated_normal(shape=[200, 200, 3, 3], stddev=0.1))
         # Gray_Scale(img)
         img = img.astype('float32')
-        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 30, 30, 1], padding='VALID')  # + Bias1
+        # print(img.shape)
+        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
         return img
-# Max Pooling
-
 
 def Max_Pool(img):
-        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
+        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='SAME')
         return img
 
 
@@ -209,6 +208,7 @@ elif First_State == 3:
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
 
+        Batch_Size = 30
         i = 0
         GMD_Miss_Learning = tf.global_variables_initializer
         while True:
@@ -217,17 +217,23 @@ elif First_State == 3:
                 img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
                 img = cv2.imread(img)
                 with tf.Session() as sess:
-                    with tf.name_scope("Convolution"):
-                        img = Convolution(img)
-                    with tf.name_scope("Relu_Function"):
-                        img = tf.nn.relu(img)
-                    with tf.name_scope("MaxPool"):
-                        Max_Pool(img)
-                # saver.save(sess, '..model\CNN\GMD_Miss\GMDmiss')
-                print(img)
-                print(i)
+                    graph = tf.Graph()
+                    with graph.as_default():
+                        with tf.name_scope("Convolution"):
+                            img = Convolution(img)
+                        with tf.name_scope("Relu_Function"):
+                            img = tf.nn.relu(img)
+                            # sess.run(img)
+                        with tf.name_scope("MaxPool"):
+                            img = Max_Pool(img)
+                if i%20 == 0:
+                    writer = tf.summary.FileWriter('..\..Graph\GMDmiss', sess.graph)
+                    print(img)
+                    print(i)
+                    writer.close()
                 i += 1
             else:
+                img = np.array(img)
                 cv2.imshow('img', img)
                 cv2.watikey(0)
                 cv2.detroyAllWindows()
