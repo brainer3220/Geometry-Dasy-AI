@@ -79,15 +79,15 @@ def average_hash(fname, size=16):
 
 
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[200, 200, 3, 3], stddev=0.1))
+        kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
         # Gray_Scale(img)
         img = img.astype('float32')
         # print(img.shape)
-        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
+        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 20, 20, 1], padding='VALID')  # + Bias1
         return img
 
 def Max_Pool(img):
-        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='SAME')
+        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
         return img
 
 
@@ -121,24 +121,31 @@ def Real_Time():
         bring_window()
         while True:
                 with mss.mss() as sct:
-                        Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
+                    Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
-                        # Below is a test to see if you are capturing the screen of the emulator.
-                        # cv2.imshow('Game_Src', Game_Scr)
-                        # cv2.waitKey(0)
+                    # Below is a test to see if you are capturing the screen of the emulator.
+                    # cv2.imshow('Game_Src', Game_Scr)
+                    # cv2.waitKey(0)
 
-                        Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-                        # Game_Scr = Game_Scr.resize((960, 540))
-                        # Game_Scr = np.ravel(Game_Scr)
+                    Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+                    # Game_Scr = np.ravel(Game_Scr)
+                    with tf.Session() as sess:
+                        graph = tf.Graph()
+                        with graph.as_default():
+                            with tf.name_scope("Convolution"):
+                                Gmd = Convolution(Game_Scr)
+                            with tf.name_scope("Relu_Function"):
+                                Gmd = tf.nn.relu(Gmd)
+                            with tf.name_scope("Convolution"):
+                                Gmd = Max_Pool(Gmd)
+                    print(Gmd.shape)
+                    print(Gmd)
+                    cv2.imshow('Game_Src', Game_Scr)
+                    cv2.waitKey(0)
 
-                        # print(Gmd.Convolution(Game_Scr))    # CNN Results
-                        Gmd = Convolution(Game_Scr)
-                        print(Gmd)
-                        Gmd = tf.Session.run(Gmd)
-
-                        # CNN
-                        # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-                        # model.add(Conv2D(64, (3, 3), activation='relu'))
+                    # CNN
+                    # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
+                    # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
 # loss = tf.reduce_mean(tf.square(y-Q_action))
@@ -150,11 +157,11 @@ def Vidio_Analyze(Video):
         success, image = Vidcap.read()
         count = 0
         while success:
-                # save frame as JPEG file
-                cv2.imwrite("frame%d.jpg" % count, image)
-                success, image = Vidcap.read()
-                print('Read a new frame: ', success)
-                count += 1
+            # save frame as JPEG file
+            cv2.imwrite("frame%d.jpg" % count, image)
+            success, image = Vidcap.read()
+            print('Read a new frame: ', success)
+            count += 1
 
 def Game_Play_With_Learning():
         Num_Of_Play_Time = int(input("Press number from Game Time."))
@@ -223,16 +230,20 @@ elif First_State == 3:
                             img = Convolution(img)
                         with tf.name_scope("Relu_Function"):
                             img = tf.nn.relu(img)
-                            # sess.run(img)
                         with tf.name_scope("MaxPool"):
                             img = Max_Pool(img)
+                            print(img.shape)
+                        with tf.name_scope("Fully_Connected"):
+                            W1 = tf.Variable(tf.truncated_normal(shape=[8*7*7,3]))
+                            B1 = tf.Variable(tf.truncated_normal(shape=[10]))
+
                 if i%20 == 0:
                     writer = tf.summary.FileWriter('..\..Graph\GMDmiss', sess.graph)
                     print(img)
                     print(i)
-                    writer.close()
                 i += 1
             else:
+                writer.close()
                 img = np.array(img)
                 cv2.imshow('img', img)
                 cv2.watikey(0)
