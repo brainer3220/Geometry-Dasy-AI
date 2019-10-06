@@ -11,19 +11,19 @@ from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
 
-sess = tf.Session()
+saver = tf.train.Saver()
 
-epsilon = 1  # Random probability
-epsilon_Minimum_Value = 0.001  # epsilon의 최소값
+Epsilon = 1  # Random probability
+Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
 nbActions = 2  # Number of actions (jump, wait)
-epoch = 1001  # Game repeat count
-hidden_Size = 100  # Hidden layer count
-max_Memory = 5000  # Maximum number of game contents remembered
+Epoch = 1001  # Game repeat count
+Hidden_Size = 100  # Hidden layer count
+Max_Memory = 5000  # Maximum number of game contents remembered
 batch_Size = 50  # Number of data bundles in training
-grid_Size = 10  # Grid size
-nb_States = grid_Size * grid_Size  # State count
+Grid_Size = 10  # Grid size
+nb_States = Grid_Size * Grid_Size  # State count
 Discount = 0.9  # discount Value
-learning_Rate = 0.2  # Learning_Rate
+Learning_Rate = 0.2  # Learning_Rate
 
 Reword_List = []
 
@@ -83,7 +83,7 @@ def Convolution(img):
         # Gray_Scale(img)
         img = img.astype('float32')
         # print(img.shape)
-        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 20, 20, 1], padding='VALID')  # + Bias1
+        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
         return img
 
 def Max_Pool(img):
@@ -119,7 +119,9 @@ def Gray_Scale(img):
 
 def Real_Time():
         bring_window()
+        i = 0
         while True:
+                i+=1
                 with mss.mss() as sct:
                     Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
@@ -136,12 +138,15 @@ def Real_Time():
                                 Gmd = Convolution(Game_Scr)
                             with tf.name_scope("Relu_Function"):
                                 Gmd = tf.nn.relu(Gmd)
-                            with tf.name_scope("Convolution"):
+                            with tf.name_scope("MaxPool"):
                                 Gmd = Max_Pool(Gmd)
+                            if i == 1:
+                                writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                                writer.close()
                     print(Gmd.shape)
                     print(Gmd)
-                    cv2.imshow('Game_Src', Game_Scr)
-                    cv2.waitKey(0)
+                    # cv2.imshow('Game_Src', Game_Scr)
+                    # cv2.waitKey(0)
 
                     # CNN
                     # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
@@ -234,18 +239,22 @@ elif First_State == 3:
                             img = Max_Pool(img)
                             print(img.shape)
                         with tf.name_scope("Fully_Connected"):
-                            W1 = tf.Variable(tf.truncated_normal(shape=[8*7*7,3]))
-                            B1 = tf.Variable(tf.truncated_normal(shape=[10]))
+                            img = tf.reshape(img, [-1, 30*58*3])
+                        with tf.name_scope("Output_layer"):
+                            W = tf.Variable(tf.random_normal([30*58*3, 3], stddev=0.01))
+                            B = tf.Variable(tf.random_normal([3]))
+                            with tf.name_scope("Linear_Regression"):
+                                img = tf.matmul(img, W)
+                            with tf.name_scope("SoftMax"):
+                                img = tf.nn.softmax(img)
 
-                if i%20 == 0:
-                    writer = tf.summary.FileWriter('..\..Graph\GMDmiss', sess.graph)
-                    print(img)
-                    print(i)
+                        if i%20 == 0:
+                            saver.save(sess, '..\Learning\CheckPoint', Learning_Step = i)
+                        if i == 1:
+                            writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                            print(img)
+                            print(i)
+                            writer.close()
                 i += 1
             else:
-                writer.close()
-                img = np.array(img)
-                cv2.imshow('img', img)
-                cv2.watikey(0)
-                cv2.detroyAllWindows()
                 break
