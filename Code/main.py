@@ -222,7 +222,7 @@ elif First_State == 3:
 
         Batch_Size = 30
         i = 0
-        GMD_Miss_Learning = tf.global_variables_initializer
+        sess.run(tf.global_variables_initializer())
         while True:
             if i in range(len(Img_Folder)):
                 img = File_List[i]
@@ -244,9 +244,28 @@ elif First_State == 3:
                             W = tf.Variable(tf.random_normal([30*58*3, 3], stddev=0.01))
                             B = tf.Variable(tf.random_normal([3]))
                             with tf.name_scope("Linear_Regression"):
-                                img = tf.matmul(img, W)
+                                Linear = tf.matmul(img, W)
                             with tf.name_scope("SoftMax"):
-                                img = tf.nn.softmax(img)
+                                SoftMax = tf.nn.softmax(Linear)
+
+                    """
+                        lables is state num.
+                        0: Nothing
+                        1: Game play screen
+                        2: Game over screen
+                    """
+
+                        with tf.name_scope("Learning"):
+                            with tf.name_scope("Reduce_Mean"):
+                                loss = tf.reduce_mean(tf.nn.softmax_crooss_entropy_with_logits_v2(logits=Linear, lables=2))
+                            with tf.name_scope("Optimizer"):
+                                Optimizer = tf.train.AdamOptimizer(Learning_Rate)
+                            with tf.name_scope("Train"):
+                                Train = Optimizer.minize(loss)
+                            with tf.name_scope("Argmax_Compare"):
+                                Predictive_Val = tf.equal(tf.argmax(SoftMax, 1), tf.argmax(W, 1))
+                            with tf.name_scope("Accuracy"):
+                                Accuracy = tf.reduce_mean(tf.cast.(Predictive_Val, dtype=tf.tf.float32))
 
                         if i%20 == 0:
                             saver.save(sess, '..\Learning\CheckPoint', Learning_Step = i)
@@ -257,4 +276,22 @@ elif First_State == 3:
                             writer.close()
                 i += 1
             else:
+                for i in range(len(Img_Folder)):
+                    total_batch = int(mnist.train.num_examples / batch_size)  # 55,000 / 100
+                    or step in range(total_batch):
+
+                    batch_x_data, batch_t_data = mnist.train.next_batch(batch_size)
+
+                    loss_val, _ = sess.run([loss, train], feed_dict={X: batch_x_data, T: batch_t_data})
+
+                    if step % 50 == 0:
+                        print("epochs = ", i, ", step = ", step, ", loss_val = ", loss_val)
+                        end_time = datetime.now()
+                        print("\nelapsed time = ", end_time - start_time)
+
+                        # Accuracy 확인
+                        test_x_data = mnist.test.images    # 10000 X 784
+                        test_t_data = mnist.test.labels    # 10000 X 10
+                        accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
+                        print("\nAccuracy = ", accuracy_val)
                 break
