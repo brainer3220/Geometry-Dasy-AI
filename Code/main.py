@@ -11,7 +11,7 @@ from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
 
-saver = tf.train.Saver()
+# saver = tf.train.Saver()
 
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
@@ -77,7 +77,7 @@ def average_hash(fname, size=16):
         diff = 1 * (pixels > avg)
         print(diff)
 
-
+@tf.function
 def Convolution(img):
         kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
         # Gray_Scale(img)
@@ -85,7 +85,7 @@ def Convolution(img):
         # print(img.shape)
         img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
         return img
-
+@tf.function
 def Max_Pool(img):
         img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
         return img
@@ -111,7 +111,7 @@ sess = tf.Session()
 
 # Gray Scale
 
-
+@tf.function
 def Gray_Scale(img):
         tf.image.rgb_to_grayscale(
             img,
@@ -248,24 +248,22 @@ elif First_State == 3:
                             with tf.name_scope("SoftMax"):
                                 SoftMax = tf.nn.softmax(Linear)
 
-                    """
-                        lables is state num.
-                        0: Nothing
-                        1: Game play screen
-                        2: Game over screen
-                    """
+                    #     lables is state num.
+                    #     0: Nothing
+                    #     1: Game play screen
+                    #     2: Game over screen
 
                         with tf.name_scope("Learning"):
                             with tf.name_scope("Reduce_Mean"):
-                                loss = tf.reduce_mean(tf.nn.softmax_crooss_entropy_with_logits_v2(logits=Linear, lables=2))
+                                loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=Linear, labels=3))
                             with tf.name_scope("Optimizer"):
                                 Optimizer = tf.train.AdamOptimizer(Learning_Rate)
                             with tf.name_scope("Train"):
                                 Train = Optimizer.minize(loss)
                             with tf.name_scope("Argmax_Compare"):
                                 Predictive_Val = tf.equal(tf.argmax(SoftMax, 1), tf.argmax(W, 1))
-                            with tf.name_scope("Accuracy"):
-                                Accuracy = tf.reduce_mean(tf.cast.(Predictive_Val, dtype=tf.tf.float32))
+                            # with tf.name_scope("Accuracy"):
+                            #     Accuracy = tf.reduce_mean(tf.cast.(Predictive_Val, dtype=tf.tf.float32))
 
                         if i%20 == 0:
                             saver.save(sess, '..\Learning\CheckPoint', Learning_Step = i)
@@ -278,7 +276,6 @@ elif First_State == 3:
             else:
                 for i in range(len(Img_Folder)):
                     total_batch = int(mnist.train.num_examples / batch_size)  # 55,000 / 100
-                    or step in range(total_batch):
 
                     batch_x_data, batch_t_data = mnist.train.next_batch(batch_size)
 
