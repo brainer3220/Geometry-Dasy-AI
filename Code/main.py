@@ -77,7 +77,6 @@ def average_hash(fname, size=16):
         diff = 1 * (pixels > avg)
         print(diff)
 
-@tf.function
 def Convolution(img):
         kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
         # Gray_Scale(img)
@@ -85,7 +84,7 @@ def Convolution(img):
         # print(img.shape)
         img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
         return img
-@tf.function
+
 def Max_Pool(img):
         img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
         return img
@@ -110,8 +109,6 @@ Game_Src_Click_pos = [379, 283]
 sess = tf.Session()
 
 # Gray Scale
-
-@tf.function
 def Gray_Scale(img):
         tf.image.rgb_to_grayscale(
             img,
