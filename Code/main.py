@@ -11,7 +11,7 @@ from PIL import Image
 from PIL import ImageGrab
 from keras.models import Sequential
 
-# saver = tf.train.Saver()
+saver = tf.train.Saver
 
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
@@ -34,60 +34,58 @@ reword = 0
 # Funciton
 
 # Jump Function
-
-
 def Jump():
-        pag.press("space")
+    pag.press("space")
 
 # Q Value Function
 
 
 def Q_Value(State, Action):
-        reword + (Discount * max(Q_next))
-        return
+    reword + (Discount * max(Q_next))
+    # return
 
 # Click to Start Button
 
 
 def Click_Start():
-        pag.moveTo(417, 257)    # X and y coordinates of the start button
-        pag.mouseDown()
-        pag.mouseUp()
+    pag.moveTo(417, 257)    # X and y coordinates of the start button
+    pag.mouseDown()
+    pag.mouseUp()
 
 # Bring the emulator to the front
 
 
 def bring_window():
-        time.sleep(0.5)
-        apple = """
-        tell application "BlueStacks"
-        activate
-        end tell
-        """
+    time.sleep(0.5)
+    apple = """
+    tell application "BlueStacks"
+    activate
+    end tell
+    """
 
 
 def average_hash(fname, size=16):
-        img = Image.open(fname)
-        img = img.convert('L')
-        img = img.resize((960, 540), Image.ANTIALIAS)
-        pixel_data = img.getdata()
-        pixels = np.array(pixel_data)
-        pixels = pixels.reshape((960, 540))
-        avg = pixels.mean()
-        diff = 1 * (pixels > avg)
-        print(diff)
+    img = Image.open(fname)
+    img = img.convert('L')
+    img = img.resize((960, 540), Image.ANTIALIAS)
+    pixel_data = img.getdata()
+    pixels = np.array(pixel_data)
+    pixels = pixels.reshape((960, 540))
+    avg = pixels.mean()
+    diff = 1 * (pixels > avg)
+    print(diff)
 
 def Convolution(img):
-        kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
-        # Gray_Scale(img)
-        img = img.astype('float32')
-        # print(img.shape)
-        img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
-        return img
+    kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
+    # Gray_Scale(img)
+    img = img.astype('float32')
+    # print(img.shape)
+    img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
+    return img
 
 def Max_Pool(img):
-        img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
-        return img
+    img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
+    return img
 
 
 Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
@@ -115,39 +113,39 @@ def Gray_Scale(img):
             name=None)
 
 def Real_Time():
-        bring_window()
-        i = 0
-        while True:
-                i+=1
-                with mss.mss() as sct:
-                    Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
+    bring_window()
+    i = 0
+    while True:
+            i+=1
+            with mss.mss() as sct:
+                Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
-                    # Below is a test to see if you are capturing the screen of the emulator.
-                    # cv2.imshow('Game_Src', Game_Scr)
-                    # cv2.waitKey(0)
+                # Below is a test to see if you are capturing the screen of the emulator.
+                # cv2.imshow('Game_Src', Game_Scr)
+                # cv2.waitKey(0)
 
-                    Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-                    # Game_Scr = np.ravel(Game_Scr)
-                    with tf.Session() as sess:
-                        graph = tf.Graph()
-                        with graph.as_default():
-                            with tf.name_scope("Convolution"):
-                                Gmd = Convolution(Game_Scr)
-                            with tf.name_scope("Relu_Function"):
-                                Gmd = tf.nn.relu(Gmd)
-                            with tf.name_scope("MaxPool"):
-                                Gmd = Max_Pool(Gmd)
-                            if i == 1:
-                                writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
-                                writer.close()
-                    print(Gmd.shape)
-                    print(Gmd)
-                    # cv2.imshow('Game_Src', Game_Scr)
-                    # cv2.waitKey(0)
+                Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+                # Game_Scr = np.ravel(Game_Scr)
+                with tf.Session() as sess:
+                    graph = tf.Graph()
+                    with graph.as_default():
+                        with tf.name_scope("Convolution"):
+                            Gmd = Convolution(Game_Scr)
+                        with tf.name_scope("Relu_Function"):
+                            Gmd = tf.nn.relu(Gmd)
+                        with tf.name_scope("MaxPool"):
+                            Gmd = Max_Pool(Gmd)
+                        if i == 1:
+                            writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                            writer.close()
+                print(Gmd.shape)
+                print(Gmd)
+                # cv2.imshow('Game_Src', Game_Scr)
+                # cv2.waitKey(0)
 
-                    # CNN
-                    # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-                    # model.add(Conv2D(64, (3, 3), activation='relu'))
+                # CNN
+                # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
+                # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
 # loss = tf.reduce_mean(tf.square(y-Q_action))
@@ -155,30 +153,30 @@ def Real_Time():
 # training_op = optimizer.minize(loss)
 
 def Vidio_Analyze(Video):
-        Vidcap = cv2.VideoCapture(Video)
+    Vidcap = cv2.VideoCapture(Video)
+    success, image = Vidcap.read()
+    count = 0
+    while success:
+        # save frame as JPEG file
+        cv2.imwrite("frame%d.jpg" % count, image)
         success, image = Vidcap.read()
-        count = 0
-        while success:
-            # save frame as JPEG file
-            cv2.imwrite("frame%d.jpg" % count, image)
-            success, image = Vidcap.read()
-            print('Read a new frame: ', success)
-            count += 1
+        print('Read a new frame: ', success)
+        count += 1
 
 def Game_Play_With_Learning():
-        Num_Of_Play_Time = int(input("Press number from Game Time."))
-        while True:
-                Real_Time()
-                Play_Time = time.time() # Game start time
-                Jump()
+    Num_Of_Play_Time = int(input("Press number from Game Time."))
+    while True:
+            Real_Time()
+            Play_Time = time.time() # Game start time
+            Jump()
 
-                # if:        # if ended from One of game, up to Play Time.
-                #
-                #     Num_Of_Play_Time += 1
-                #     Play_Time = time.time() - Play_Time # Playtime for one game
+            # if:        # if ended from One of game, up to Play Time.
+            #
+            #     Num_Of_Play_Time += 1
+            #     Play_Time = time.time() - Play_Time # Playtime for one game
 
-                if epoch > Play_Time:
-                        break
+            if epoch > Play_Time:
+                    break
 # def Play_Learning:
 
 
@@ -197,95 +195,103 @@ Press 3.
 """))
 
 if First_State == 1:
-        Video = input("Please enter a video path and video name.")
-        Vidio_Analyze(Video)
+    Video = input("Please enter a video path and video name.")
+    Vidio_Analyze(Video)
 elif First_State == 2:
-        Real_Time()
+    Real_Time()
 elif First_State == 3:
-        Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
-        File_List = os.listdir(Img_Folder)
-        print(File_List)
-        img = os.path.join(os.getcwd(), Img_Folder, File_List[0])
-        print(File_List[0])
-        img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-        img = np.array(img)
-        print(img)
-        print(len(File_List))
+    Img_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
+    File_List = os.listdir(Img_Folder)
+    print(File_List)
+    img = os.path.join(os.getcwd(), Img_Folder, File_List[0])
+    print(File_List[0])
+    img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+    img = np.array(img)
+    print(img)
+    print(len(File_List))
 
-        # Test that the file is read correctly
-        # cv2.imshow('img', img)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+    # Test that the file is read correctly
+    # cv2.imshow('img', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-        Batch_Size = 30
-        i = 0
-        sess.run(tf.global_variables_initializer())
-        while True:
-            if i in range(len(Img_Folder)):
-                img = File_List[i]
-                img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
-                img = cv2.imread(img)
-                with tf.Session() as sess:
-                    graph = tf.Graph()
-                    with graph.as_default():
-                        with tf.name_scope("Convolution"):
-                            img = Convolution(img)
-                        with tf.name_scope("Relu_Function"):
-                            img = tf.nn.relu(img)
-                        with tf.name_scope("MaxPool"):
-                            img = Max_Pool(img)
-                            print(img.shape)
-                        with tf.name_scope("Fully_Connected"):
-                            img = tf.reshape(img, [-1, 30*58*3])
-                        with tf.name_scope("Output_layer"):
-                            W = tf.Variable(tf.random_normal([30*58*3, 3], stddev=0.01))
-                            B = tf.Variable(tf.random_normal([3]))
-                            with tf.name_scope("Linear_Regression"):
-                                Linear = tf.matmul(img, W)
-                            with tf.name_scope("SoftMax"):
-                                SoftMax = tf.nn.softmax(Linear)
+    Batch_Size = 30
+    i = 0
+    sess.run(tf.global_variables_initializer())
+    # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
+    while True:
+        if i in range(len(Img_Folder)):
+            img = File_List[i]
+            img = os.path.join(os.getcwd(), Img_Folder, File_List[i])
+            img = cv2.imread(img)
+            with tf.Session() as sess:
+                graph = tf.Graph()
+                with graph.as_default():
+                    with tf.name_scope("Convolution"):
+                        img = Convolution(img)
+                    with tf.name_scope("Relu_Function"):
+                        img = tf.nn.relu(img)
+                    with tf.name_scope("MaxPool"):
+                        img = Max_Pool(img)
+                        print(img.shape)
+                    with tf.name_scope("Fully_Connected"):
+                        X = tf.reshape(img, [-1, 30*58*1])    # img is X
+                    with tf.name_scope("Output_layer"):
+                        Y = tf.placeholder(tf.float32, shape=[None, 3])
+                        W = tf.Variable(tf.zeros(shape=[30*58*1, 3]))
+                        B = tf.Variable(tf.zeros(shape=[3]))
 
-                    #     lables is state num.
-                    #     0: Nothing
-                    #     1: Game play screen
-                    #     2: Game over screen
+                        Logits = tf.matmul(X, W) + B
+                        # with tf.name_scope("Linear_Regression"):
+                        #     Linear = tf.matmul(img, W)
+                        with tf.name_scope("SoftMax"):
+                            Y_Pred = tf.nn.softmax(Logits)
+                            # SoftMax = tf.nn.softmax(Linear)
 
-                        with tf.name_scope("Learning"):
-                            with tf.name_scope("Reduce_Mean"):
-                                loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=Linear, labels=3))
-                            with tf.name_scope("Optimizer"):
-                                Optimizer = tf.train.AdamOptimizer(Learning_Rate)
-                            with tf.name_scope("Train"):
-                                Train = Optimizer.minize(loss)
-                            with tf.name_scope("Argmax_Compare"):
-                                Predictive_Val = tf.equal(tf.argmax(SoftMax, 1), tf.argmax(W, 1))
-                            # with tf.name_scope("Accuracy"):
-                            #     Accuracy = tf.reduce_mean(tf.cast.(Predictive_Val, dtype=tf.tf.float32))
+                #     lables is state num.
+                #     0: Nothing
+                #     1: Game play screen
+                #     2: Game over screen
 
-                        if i%20 == 0:
-                            saver.save(sess, '..\Learning\CheckPoint', Learning_Step = i)
-                        if i == 1:
-                            writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
-                            print(img)
-                            print(i)
-                            writer.close()
-                i += 1
-            else:
-                for i in range(len(Img_Folder)):
-                    total_batch = int(mnist.train.num_examples / batch_size)  # 55,000 / 100
+                    with tf.name_scope("Learning"):
+                        with tf.name_scope("Reduce_Mean"):
+                            Loss = tf.reduce_mean(-tf.reduce_sum(Y * tf.log(Y_Pred)))
+                            # loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=2, logits=Linear))
+                        with tf.name_scope("TrainStep"):
+                            Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
+                        # with tf.name_scope("Optimizer"):
+                        #     Optimizer = tf.train.AdamOptimizer(Learning_Rate)
+                        # with tf.name_scope("Train"):
+                        #     Train = Optimizer.minize(loss)
+                        # with tf.name_scope("Argmax_Compare"):
+                        #     Predictive_Val = tf.equal(tf.argmax(SoftMax, 1), tf.argmax(W, 1))
+                        # with tf.name_scope("Accuracy"):
+                        #     Accuracy = tf.reduce_mean(tf.cast.(Predictive_Val, dtype=tf.tf.float32))
 
-                    batch_x_data, batch_t_data = mnist.train.next_batch(batch_size)
+                    # if i%20 == 0:
+                    #     saver.save(sess=sess, save_path='..\model\GMDmissLearningData', global_step=None)
+                    if i == 1:
+                        writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                        print(img)
+                        print(i)
+                        writer.close()
+            i += 1
+        else:
+            for i in range(len(Img_Folder)):
+                total_batch = int(mnist.train.num_examples / batch_size)  # 55,000 / 100
 
-                    loss_val, _ = sess.run([loss, train], feed_dict={X: batch_x_data, T: batch_t_data})
+                batch_x_data, batch_t_data = mnist.train.next_batch(batch_size)
 
-                    if step % 50 == 0:
-                        print("epochs = ", i, ", step = ", step, ", loss_val = ", loss_val)
-                        end_time = datetime.now()
-                        print("\nelapsed time = ", end_time - start_time)
+                loss_val, _ = sess.run([loss, train], feed_dict={X: batch_x_data, T: batch_t_data})
 
-                        # Accuracy 확인
-                        test_x_data = mnist.test.images    # 10000 X 784
-                        test_t_data = mnist.test.labels    # 10000 X 10
-                        accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
-                        print("\nAccuracy = ", accuracy_val)
-                break
+                if step % 50 == 0:
+                    print("epochs = ", i, ", step = ", step, ", loss_val = ", loss_val)
+                    end_time = datetime.now()
+                    print("\nelapsed time = ", end_time - start_time)
+
+                    # Accuracy 확인
+                    test_x_data = mnist.test.images    # 10000 X 784
+                    test_t_data = mnist.test.labels    # 10000 X 10
+                    accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
+                    print("\nAccuracy = ", accuracy_val)
+            break
