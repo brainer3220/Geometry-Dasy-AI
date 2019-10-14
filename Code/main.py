@@ -226,7 +226,9 @@ elif First_State == 3:
     GMD_Miss_Y = [0,0,1]
     GMD_Miss_Y = np.tile(GMD_Miss_Y, (3,1))
     print(GMD_Miss_Y)
+    Img_Miss_List = []
     while True:
+<<<<<<< HEAD
         if i <= len(GmdMiss_Folder):
             Img = GmdMiss_List[i]
             Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
@@ -289,6 +291,69 @@ elif First_State == 3:
                         Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img, Y: GMD_Miss_Y})
                         if Step % 100 == 0:
                             print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
+=======
+        for i in len(GmdMiss_Folder):
+            Img_Miss_List.append(GmdMiss_List[i])
+            
+        with tf.Session() as sess:
+            graph = tf.Graph()
+            with graph.as_default():
+                with tf.name_scope("Convolution"):
+                    Img = Convolution(Img)
+                with tf.name_scope("Relu_Function"):
+                    Img = tf.nn.relu(Img)
+                with tf.name_scope("MaxPool"):
+                    Img = Max_Pool(Img)
+                    print(Img.shape)
+                with tf.name_scope("Img_Fatten"):
+                    Img_Flatten = tf.reshape(Img, [-1, 30*58*1])
+                # with tf.name_scope("Fully_Connected"):
+                #     X = tf.reshape(Img, [-1, 30*58*1])    # img is X
+                with tf.name_scope("Output_layer"):
+                    X = tf.placeholder(tf.float32, shape=[None, 1740])
+                    Y = tf.placeholder(tf.float32, shape=[None, 3])
+                    W = tf.Variable(tf.zeros(shape=[30*58*1, 3]))
+                    B = tf.Variable(tf.zeros(shape=[3]))
+
+                with tf.name_scope("Logits"):
+                    Logits = tf.matmul(Img_Flatten, W) + B
+
+                with tf.name_scope("SoftMax"):
+                    Y_Pred = tf.nn.softmax(Logits)
+
+            #     lables is state num.
+            #     0: Nothing
+            #     1: Game play screen
+            #     2: Game over screen
+
+                with tf.name_scope("Learning"):
+                    with tf.name_scope("Reduce_Mean"):
+                        Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
+                    # with tf.name_scope("TrainStep"):
+                    #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
+                    with tf.name_scope("Optimizer"):
+                        Optimizer = tf.train.AdamOptimizer(Learning_Rate)
+                    with tf.name_scope("Train"):
+                        Train = Optimizer.minimize(loss=Loss)
+                    with tf.name_scope("Argmax_Compare"):
+                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
+                    with tf.name_scope("Accuracy"):
+                        Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
+
+                if i == 1:
+                    writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                    print(Img)
+                    print(i)
+                    writer.close()
+
+            start_time = datetime.now()
+            for k in range(30):
+                Total_Batch = int(len(GmdMiss_List) / Batch_Size)
+                for Step in range(Total_Batch):
+                    Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
+                    if Step % 100 == 0:
+                        print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
+>>>>>>> ca92000751202459ee7a7f2a9b63e39fd1542f96
                 End_Time = datetime.now()
                     # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
             i += 1
