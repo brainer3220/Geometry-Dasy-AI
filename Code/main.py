@@ -242,7 +242,7 @@ elif First_State == 3:
                         Img = Max_Pool(Img)
                         print(Img.shape)
                     with tf.name_scope("Img_Fatten"):
-                        Img_Flatten = tf.reshape(Img, [-1, 30*58*1])
+                        Img_Flatten = tf.reshape(Img, [-1, 30, 58, 1])
                     # with tf.name_scope("Fully_Connected"):
                     #     X = tf.reshape(Img, [-1, 30*58*1])    # img is X
                     with tf.name_scope("Output_layer"):
@@ -252,7 +252,7 @@ elif First_State == 3:
                         B = tf.Variable(tf.zeros(shape=[3]))
 
                     with tf.name_scope("Logits"):
-                        Logits = tf.matmul(Img_Flatten, W) + B
+                        Logits = tf.matmul(X, W) + B
 
                     with tf.name_scope("SoftMax"):
                         Y_Pred = tf.nn.softmax(Logits)
@@ -290,7 +290,6 @@ elif First_State == 3:
                         if Step % 100 == 0:
                             print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
                 End_Time = datetime.now()
-
                     # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
             i += 1
             print(i)
