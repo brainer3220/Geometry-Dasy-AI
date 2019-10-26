@@ -219,16 +219,19 @@ elif First_State == 3:
     # cv2.destroyAllWindows()
 
     Batch_Size = 30
-    i = 0
     sess.run(tf.global_variables_initializer())
     # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
     GMD_Miss_Y = [0,0,1]
     GMD_Miss_Y = np.tile(GMD_Miss_Y, (3,1))
     print(GMD_Miss_Y)
     Img_Miss_List = []
+
+    # print(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[1]), cv2.IMREAD_GRAYSCALE)))
+
     while True:
-        for i in GmdMiss_List:
-            Img_Miss_List[i] = (cv2.imread(GmdMiss_List(i), cv2.IMREAD_GRAYSCALE))
+        for i in range(0, len(GmdMiss_List)):
+            print(i)
+            Img_Miss_List[i] = np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i]), cv2.IMREAD_GRAYSCALE))
 
         with tf.Session() as sess:
             graph = tf.Graph()
