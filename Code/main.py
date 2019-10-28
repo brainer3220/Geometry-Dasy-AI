@@ -228,11 +228,15 @@ elif First_State == 3:
 
     # print(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[1]), cv2.IMREAD_GRAYSCALE)))
 
+    for i in range(0, len(GmdMiss_List)):
+        print(i)
+        Img_Miss_List.append(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i]), cv2.IMREAD_GRAYSCALE)))
+    i = 0
+    print(Img_Miss_List[1])
+    bias = np.ones((1, 1), dtype=float)
     while True:
-        for i in range(0, len(GmdMiss_List)):
-            print(i)
-            Img_Miss_List[i] = np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i]), cv2.IMREAD_GRAYSCALE))
-
+        Img = Img_Miss_List[i]
+        Img = cv2.resize(Img, dsize=(960, 540), interpolation=cv2.INTER_AREA)
         with tf.Session() as sess:
             graph = tf.Graph()
             with graph.as_default():
@@ -295,6 +299,8 @@ elif First_State == 3:
                     # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
             i += 1
             print(i)
+            if i == len(Img_Miss_List):
+                break
                     # # Accuracy 확인
                     # test_x_data = mnist.test.images    # 10000 X 784
                     # test_t_data = mnist.test.labels    # 10000 X 10
