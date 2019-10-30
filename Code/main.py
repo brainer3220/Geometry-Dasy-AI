@@ -230,13 +230,18 @@ elif First_State == 3:
 
     for i in range(0, len(GmdMiss_List)):
         print(i)
-        Img_Miss_List.append(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i]), cv2.IMREAD_GRAYSCALE)))
+        with open(GmdMiss_Folder, GmdMiss_List[i]) as f:
+            Img_Miss_List.append(f.read())
+        # Img_Miss_List.append((np.array(GmdMiss_Folder, GmdMiss_List[i])))
+        # Img_Miss_List.append(np.array(cv2.imread(GmdMiss_List[i], cv2.IMREAD_GRAYSCALE)))
     i = 0
-    print(Img_Miss_List[1])
     bias = np.ones((1, 1), dtype=float)
     while True:
         Img = Img_Miss_List[i]
-        Img = cv2.resize(Img, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+        print(Img)
+        # Img = tf.reshape(Img, [4, 1])
+        print(Img)
+        # Img = cv2.resize(Img, dsize=(960, 540), interpolation=cv2.INTER_AREA)
         with tf.Session() as sess:
             graph = tf.Graph()
             with graph.as_default():
