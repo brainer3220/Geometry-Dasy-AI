@@ -233,8 +233,11 @@ elif First_State == 3:
         Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
         print(GmdMiss_Folder)
         print(Img)
-        Img = cv2.imread(Img, cv2.IMREAD_GRAYSCALE)
+        Img = cv2.imread(Img)
+        Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
         Img = np.array(Img)
+        Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
+        # tf.reshape(Img, 1080, 1920, 1, 1)
         print(Img.shape)
         Img_Miss_List.append(Img)
     i = 0
