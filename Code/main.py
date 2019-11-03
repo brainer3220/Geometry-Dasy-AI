@@ -231,8 +231,6 @@ elif First_State == 3:
     for i in range(0, len(GmdMiss_List)):
         print(i)
         Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
-        print(GmdMiss_Folder)
-        print(Img)
         Img = cv2.imread(Img)
         Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
         Img = np.array(Img)
@@ -243,6 +241,7 @@ elif First_State == 3:
     i = 0
     bias = np.ones((1, 1), dtype=float)
     while True:
+        print(i)
         Img = Img_Miss_List[i]
         print(Img)
         # Img = tf.reshape(Img, [4, 1])
@@ -260,12 +259,12 @@ elif First_State == 3:
                     print(Img.shape)
                 with tf.name_scope("Img_Fatten"):
                     Img_Flatten = tf.reshape(Img, [-1, 30, 58, 1])
-                # with tf.name_scope("Fully_Connected"):
-                #     X = tf.reshape(Img, [-1, 30*58*1])    # img is X
+                with tf.name_scope("Fully_Connected"):
+                    X = tf.reshape(Img_Flatten, [-1, 30*58*1])    # img is X
                 with tf.name_scope("Output_layer"):
-                    X = tf.placeholder(tf.float32, shape=[None, 1740])
+                    X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
                     Y = tf.placeholder(tf.float32, shape=[None, 3])
-                    W = tf.Variable(tf.zeros(shape=[30*58*1, 3]))
+                    W = tf.Variable(tf.zeros(shape=[30*58*3, 3]))
                     B = tf.Variable(tf.zeros(shape=[3]))
 
                 with tf.name_scope("Logits"):
@@ -292,23 +291,26 @@ elif First_State == 3:
                         Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
                     with tf.name_scope("Accuracy"):
                         Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
+                print(Img.shape)
 
-                if i == 1:
+                if i == 1623:
                     writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
                     print(Img)
                     print(i)
+                    saver.save(save_path='F:\Programing\Geomatry-Dasy-AI\Model\CNN', global_step=i)
                     writer.close()
+                    break
+                i += 1
 
             start_time = datetime.now()
-            for k in range(30):
-                Total_Batch = int(len(GmdMiss_List) / Batch_Size)
-                for Step in range(Total_Batch):
-                    Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
-                    if Step % 100 == 0:
-                        print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
-                End_Time = datetime.now()
-                    # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
-            i += 1
+        # for k in range(30):
+        #     Total_Batch = int(len(GmdMiss_List) / Batch_Size)
+        #     # for Step in range(Total_Batch):
+        #     #     Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
+        #     if k % 100 == 0:
+        #         print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
+        #     End_Time = datetime.now()
+                # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
             print(i)
             if i == len(Img_Miss_List):
                 break
