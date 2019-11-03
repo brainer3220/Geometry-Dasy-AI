@@ -230,10 +230,13 @@ elif First_State == 3:
 
     for i in range(0, len(GmdMiss_List)):
         print(i)
-        with open(GmdMiss_Folder, GmdMiss_List[i]) as f:
-            Img_Miss_List.append(f.read())
-        # Img_Miss_List.append((np.array(GmdMiss_Folder, GmdMiss_List[i])))
-        # Img_Miss_List.append(np.array(cv2.imread(GmdMiss_List[i], cv2.IMREAD_GRAYSCALE)))
+        Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
+        print(GmdMiss_Folder)
+        print(Img)
+        Img = cv2.imread(Img, cv2.IMREAD_GRAYSCALE)
+        Img = np.array(Img)
+        print(Img.shape)
+        Img_Miss_List.append(Img)
     i = 0
     bias = np.ones((1, 1), dtype=float)
     while True:
