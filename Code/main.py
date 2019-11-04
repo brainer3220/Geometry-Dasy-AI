@@ -203,15 +203,8 @@ elif First_State == 2:
 elif First_State == 3:
     GmdMiss_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
     GMD_Play_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD_Play')
-    GMD_Play_Folder = os.listdir(GMD_Play_Folder)
     GmdMiss_List = os.listdir(GmdMiss_Folder)
-    print(GmdMiss_List)
-    Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[0])
-    print(GmdMiss_List[0])
-    Img = cv2.imread(Img, cv2.IMREAD_GRAYSCALE)
-    Img = np.array(Img)
-    print(Img)
-    print(len(GmdMiss_List))
+    GMD_Play_List = os.listdir(GMD_Play_Folder)
 
     # Test that the file is read correctly
     # cv2.imshow('img', img)
@@ -225,6 +218,7 @@ elif First_State == 3:
     GMD_Miss_Y = np.tile(GMD_Miss_Y, (3,1))
     print(GMD_Miss_Y)
     Img_Miss_List = []
+    Img_Play_List = []
 
     # print(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[1]), cv2.IMREAD_GRAYSCALE)))
 
@@ -235,9 +229,16 @@ elif First_State == 3:
         Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
         Img = np.array(Img)
         Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
-        # tf.reshape(Img, 1080, 1920, 1, 1)
-        print(Img.shape)
         Img_Miss_List.append(Img)
+
+    # for i in range(0, len(GMD_Play_List)):
+    #     print(i)
+    #     Img = os.path.join(os.getcwd(), GMD_Play_Folder, GMD_Play_List[i])
+    #     Img = cv2.imread(Img)
+    #     Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
+    #     Img = np.array(Img)
+    #     Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
+    #     Img_Play_List.append(Img)
     i = 0
     bias = np.ones((1, 1), dtype=float)
     while True:
@@ -258,59 +259,61 @@ elif First_State == 3:
                     Img = Max_Pool(Img)
                     print(Img.shape)
                 with tf.name_scope("Img_Fatten"):
-                    Img_Flatten = tf.reshape(Img, [-1, 30, 58, 1])
+                    Img_Flatten = tf.reshape(Img, [-1, 30*58*3])
                 with tf.name_scope("Fully_Connected"):
-                    X = tf.reshape(Img_Flatten, [-1, 30*58*1])    # img is X
+                    X = Img_Flatten    # img is X
                 with tf.name_scope("Output_layer"):
-                    X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
+                    # X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
                     Y = tf.placeholder(tf.float32, shape=[None, 3])
                     W = tf.Variable(tf.zeros(shape=[30*58*3, 3]))
                     B = tf.Variable(tf.zeros(shape=[3]))
 
-                with tf.name_scope("Logits"):
-                    Logits = tf.matmul(X, W) + B
-
-                with tf.name_scope("SoftMax"):
-                    Y_Pred = tf.nn.softmax(Logits)
+                    with tf.name_scope("Logits"):
+                        Logits = tf.matmul(Img_Flatten, W) + B
+                    with tf.name_scope("SoftMax"):
+                        Y_Pred = tf.nn.softmax(Logits)
 
             #     lables is state num.
             #     0: Nothing
             #     1: Game play screen
             #     2: Game over screen
 
-                with tf.name_scope("Learning"):
-                    with tf.name_scope("Reduce_Mean"):
-                        Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
-                    # with tf.name_scope("TrainStep"):
-                    #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
-                    with tf.name_scope("Optimizer"):
-                        Optimizer = tf.train.AdamOptimizer(Learning_Rate)
-                    with tf.name_scope("Train"):
-                        Train = Optimizer.minimize(loss=Loss)
-                    with tf.name_scope("Argmax_Compare"):
-                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
-                    with tf.name_scope("Accuracy"):
-                        Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
-                print(Img.shape)
+                # with tf.name_scope("Learning"):
+                #     with tf.name_scope("Reduce_Mean"):
+                #         Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
+                #     # with tf.name_scope("TrainStep"):
+                #     #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
+                #     with tf.name_scope("Optimizer"):
+                #         Optimizer = tf.train.AdamOptimizer(Learning_Rate)
+                #     with tf.name_scope("Train"):
+                #         Train = Optimizer.minimize(loss=Loss)
+                #     with tf.name_scope("Argmax_Compare"):
+                #         Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
+                #     with tf.name_scope("Accuracy"):
+                #         Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
 
-                if i == 1623:
+                i+=1
+
+                if i == len(GmdMiss_List):
                     writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
                     print(Img)
                     print(i)
                     saver.save(save_path='F:\Programing\Geomatry-Dasy-AI\Model\CNN', global_step=i)
                     writer.close()
+
+                    for k in range(1000):
+                        sess.run(fetches, feed_dict=None, options=None, run_metadata=None)
                     break
-                i += 1
 
             start_time = datetime.now()
         # for k in range(30):
         #     Total_Batch = int(len(GmdMiss_List) / Batch_Size)
-        #     # for Step in range(Total_Batch):
-        #     #     Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
-        #     if k % 100 == 0:
-        #         print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
-        #     End_Time = datetime.now()
-                # saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
+            # for Step in range(Total_Batch):
+            #     Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
+            # if k % 100 == 0:
+            #     print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
+            # End_Time = datetime.now()
+            #     saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
             print(i)
             if i == len(Img_Miss_List):
                 break
