@@ -265,8 +265,8 @@ elif First_State == 3:
                 with tf.name_scope("Output_layer"):
                     # X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
                     Y = tf.placeholder(tf.float32, shape=[None, 3])
-                    W = tf.Variable(tf.zeros(shape=[30*58*3, 3]))
-                    B = tf.Variable(tf.zeros(shape=[3]))
+                    W = tf.Variable(tf.zeros(shape=[30*58*3, 3], name='Weight')
+                    B = tf.Variable(tf.zeros(shape=[3]), name='bias')
 
                     with tf.name_scope("Logits"):
                         Logits = tf.matmul(Img_Flatten, W) + B
