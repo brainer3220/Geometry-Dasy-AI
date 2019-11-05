@@ -78,7 +78,7 @@ def average_hash(fname, size=16):
 
 def Convolution(img):
     kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
-    # Gray_Scale(img)
+    Gray_Scale(img)
     img = img.astype('float32')
     # print(img.shape)
     img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
@@ -215,7 +215,7 @@ elif First_State == 3:
     sess.run(tf.global_variables_initializer())
     # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
     GMD_Miss_Y = [0,0,1]
-    GMD_Miss_Y = np.tile(GMD_Miss_Y, (3,1))
+    GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List),1))
     print(GMD_Miss_Y)
     Img_Miss_List = []
     Img_Play_List = []
@@ -265,8 +265,8 @@ elif First_State == 3:
                 with tf.name_scope("Output_layer"):
                     # X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
                     Y = tf.placeholder(tf.float32, shape=[None, 3])
-                    W = tf.Variable(tf.zeros(shape=[30*58*3, 3], name='Weight')
-                    B = tf.Variable(tf.zeros(shape=[3]), name='bias')
+                    W = tf.Variable(tf.zeros(shape=[30*58*3, 3]))
+                    B = tf.Variable(tf.zeros(shape=[3]))
 
                     with tf.name_scope("Logits"):
                         Logits = tf.matmul(Img_Flatten, W) + B
@@ -278,19 +278,19 @@ elif First_State == 3:
             #     1: Game play screen
             #     2: Game over screen
 
-                # with tf.name_scope("Learning"):
-                #     with tf.name_scope("Reduce_Mean"):
-                #         Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
-                #     # with tf.name_scope("TrainStep"):
-                #     #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
-                #     with tf.name_scope("Optimizer"):
-                #         Optimizer = tf.train.AdamOptimizer(Learning_Rate)
-                #     with tf.name_scope("Train"):
-                #         Train = Optimizer.minimize(loss=Loss)
-                #     with tf.name_scope("Argmax_Compare"):
-                #         Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
-                #     with tf.name_scope("Accuracy"):
-                #         Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
+                with tf.name_scope("Learning"):
+                    with tf.name_scope("Reduce_Mean"):
+                        Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
+                    # with tf.name_scope("TrainStep"):
+                    #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
+                    with tf.name_scope("Optimizer"):
+                        Optimizer = tf.train.AdamOptimizer(Learning_Rate)
+                    with tf.name_scope("Train"):
+                        Train = Optimizer.minimize(loss=Loss)
+                    with tf.name_scope("Argmax_Compare"):
+                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
+                    with tf.name_scope("Accuracy"):
+                        Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
 
                 i+=1
 
