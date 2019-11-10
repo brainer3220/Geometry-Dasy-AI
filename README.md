@@ -5,7 +5,7 @@
 
 ### 📋Dependency
 * Python 3.6.8
-* Tensorflow 1.14.0
+* Tensorflow 1.10.0
 * pyautogui
 * numpy
 * open-cv
