@@ -130,6 +130,9 @@ def Real_Time():
 
                 Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
                 # Game_Scr = np.ravel(Game_Scr)
+
+                GMD Model = os.path.join(os.getcwd(), '..', 'Model', 'CNN', 'saved_model.pb')
+
                 model = tensorflow.keras.models.load_model('keras_model.h5')
                 data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
 
