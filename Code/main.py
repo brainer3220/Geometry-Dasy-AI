@@ -133,7 +133,7 @@ def Real_Time():
 
                 GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
 
-                model = tensorflow.keras.models.load_model(GMD_Model)
+                model = tensorflow.keras.models.load_model('saved_model.pb')
                 data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
 
                 # Replace this with the path to your image
