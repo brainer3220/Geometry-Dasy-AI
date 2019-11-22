@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow.keras
 import pyautogui as pag
 import mss
 import cv2
@@ -11,6 +12,8 @@ from datetime import datetime      # datetime.now() 를 이용하여 학습 경�
 
 from PIL import Image
 from PIL import ImageGrab
+
+np.set_printoptions(suppress=True)
 
 saver = tf.train.Saver
 
@@ -127,6 +130,26 @@ def Real_Time():
 
                 Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
                 # Game_Scr = np.ravel(Game_Scr)
+                model = tensorflow.keras.models.load_model('keras_model.h5')
+                data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
+
+                # Replace this with the path to your image
+                image = Image.open(Game_Scr)
+
+                # Make sure to resize all images to 224, 224 otherwise they won't fit in the array
+                image = image.resize((960, 540))
+                image_array = np.asarray(image)
+
+                # Normalize the image
+                normalized_image_array = image_array / 255.0
+
+                # Load the image into the array
+                data[0] = normalized_image_array
+
+                # run the inference
+                prediction = model.predict(data)
+                print(prediction)
+
                 with tf.Session() as sess:
                     graph = tf.Graph()
                     with graph.as_default():
@@ -215,7 +238,7 @@ elif First_State == 3:
     sess.run(tf.global_variables_initializer())
     # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
     GMD_Miss_Y = [0,0,1]
-    GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List),1))
+    GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List), 1))
     print(GMD_Miss_Y)
     Img_Miss_List = []
     Img_Play_List = []
