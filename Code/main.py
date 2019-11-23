@@ -211,6 +211,13 @@ def Game_Play_With_Learning():
 # def Game_Replay():
 #     while True:
 
+ckpt = tf.train.get_checkpoint_state('F:\Programing\Geomatry-Dasy-AI\Model\CNN', latest_filename='saved_model.pb')
+
+if ckpt and ckpt.model_checkpoint_path:
+  saver.restore(sess, ckpt.model_checkpoint_path)
+  print("테스트 데이터 정확도 (Restored) : %f" % accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
+  sess.close()
+  exit()
 
 First_State = int(input("""If you want to analyze your video?
 press 1.
