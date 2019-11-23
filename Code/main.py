@@ -134,7 +134,7 @@ def Real_Time():
                 GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
                 GMD_Model_Keras = os.path.join(os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
 
-                model = tf.keras.models.load_model(GMD_Model_Keras)
+                model = saver.restore(sess, GMD_Model)
                 data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
 
                 # Replace this with the path to your image
