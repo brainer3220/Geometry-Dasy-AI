@@ -1,0 +1,2 @@
+0 GMD_Play
+1 GMD_Miss

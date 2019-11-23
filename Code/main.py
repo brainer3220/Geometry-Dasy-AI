@@ -132,8 +132,9 @@ def Real_Time():
                 # Game_Scr = np.ravel(Game_Scr)
 
                 GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
+                GMD_Model_Keras = os.path.join(os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
 
-                model = tensorflow.keras.models.load_model('saved_model.pb')
+                model = tf.keras.models.load_model(GMD_Model_Keras)
                 data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
 
                 # Replace this with the path to your image
