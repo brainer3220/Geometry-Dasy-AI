@@ -8,7 +8,8 @@ import time
 import os
 import glob
 from datetime import datetime      # datetime.now() 를 이용하여 학습 경과 시간 측정
-
+# from keras.models import Sequential
+# from keras.models import Model
 
 from PIL import Image
 from PIL import ImageGrab
@@ -120,60 +121,60 @@ def Real_Time():
     bring_window()
     i = 0
     while True:
-            i+=1
-            with mss.mss() as sct:
-                Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
+        i+=1
+        with mss.mss() as sct:
+            Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
-                # Below is a test to see if you are capturing the screen of the emulator.
-                # cv2.imshow('Game_Src', Game_Scr)
-                # cv2.waitKey(0)
+            # Below is a test to see if you are capturing the screen of the emulator.
+            # cv2.imshow('Game_Src', Game_Scr)
+            # cv2.waitKey(0)
 
-                Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-                # Game_Scr = np.ravel(Game_Scr)
+            Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+            # Game_Scr = np.ravel(Game_Scr)
 
-                GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
-                GMD_Model_Keras = os.path.join(os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
+            GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
+            GMD_Model_Keras = os.path.join(os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
 
-                model = saver.restore(sess, GMD_Model)
-                data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
+            # model = saver.restore(sess, GMD_Model)
+            data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
 
-                # Replace this with the path to your image
-                image = Image.open(Game_Scr)
+            # Replace this with the path to your image
+            image = Image.open(Game_Scr)
 
-                # Make sure to resize all images to 224, 224 otherwise they won't fit in the array
-                image = image.resize((960, 540))
-                image_array = np.asarray(image)
+            # Make sure to resize all images to 224, 224 otherwise they won't fit in the array
+            image = image.resize((960, 540))
+            image_array = np.asarray(image)
 
-                # Normalize the image
-                normalized_image_array = image_array / 255.0
+            # Normalize the image
+            normalized_image_array = image_array / 255.0
 
-                # Load the image into the array
-                data[0] = normalized_image_array
+            # Load the image into the array
+            data[0] = normalized_image_array
 
-                # run the inference
-                prediction = model.predict(data)
-                print(prediction)
+            # run the inference
+            prediction = model.predict(data)
+            print(prediction)
 
-                with tf.Session() as sess:
-                    graph = tf.Graph()
-                    with graph.as_default():
-                        with tf.name_scope("Convolution"):
-                            Gmd = Convolution(Game_Scr)
-                        with tf.name_scope("Relu_Function"):
-                            Gmd = tf.nn.relu(Gmd)
-                        with tf.name_scope("MaxPool"):
-                            Gmd = Max_Pool(Gmd)
-                        if i == 1:
-                            writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
-                            writer.close()
-                print(Gmd.shape)
-                print(Gmd)
-                # cv2.imshow('Game_Src', Game_Scr)
-                # cv2.waitKey(0)
+            with tf.Session() as sess:
+                graph = tf.Graph()
+                with graph.as_default():
+                    with tf.name_scope("Convolution"):
+                        Gmd = Convolution(Game_Scr)
+                    with tf.name_scope("Relu_Function"):
+                        Gmd = tf.nn.relu(Gmd)
+                    with tf.name_scope("MaxPool"):
+                        Gmd = Max_Pool(Gmd)
+                    if i == 1:
+                        writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                        writer.close()
+            print(Gmd.shape)
+            print(Gmd)
+            # cv2.imshow('Game_Src', Game_Scr)
+            # cv2.waitKey(0)
 
-                # CNN
-                # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-                # model.add(Conv2D(64, (3, 3), activation='relu'))
+            # CNN
+            # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
+            # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
 # loss = tf.reduce_mean(tf.square(y-Q_action))
@@ -208,16 +209,36 @@ def Game_Play_With_Learning():
 # def Play_Learning:
 
 
-# def Game_Replay():
-#     while True:
+def Game_play():
+    from tensorflow.keras.preprocessing.image import img_to_array
+    from keras.models import load_model
+    from PIL import Image, ImageOps
+    np.set_printoptions(suppress=True)
 
-ckpt = tf.train.get_checkpoint_state('F:\Programing\Geomatry-Dasy-AI\Model\CNN', latest_filename='saved_model.pb')
+    model = load_model('../Model/Keras/keras_model.h5', custom_objects=None)
 
-if ckpt and ckpt.model_checkpoint_path:
-  saver.restore(sess, ckpt.model_checkpoint_path)
-  print("테스트 데이터 정확도 (Restored) : %f" % accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
-  sess.close()
-  exit()
+    while True:
+       with mss.mss() as sct:
+            Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
+
+            # Below is a test to see if you are capturing the screen of the emulator.
+            # cv2.imshow('Game_Src', Game_Scr)
+            # cv2.waitKey(0)
+
+            Game_Scr = cv2.resize(Game_Scr, dsize=(
+                960, 540), interpolation=cv2.INTER_AREA)
+            x = np.array(Game_Scr).reshape(-1, 1)
+
+            size = (224, 224)
+            image = ImageOps.fit(Game_Scr, size, Image.ANTIALIAS)
+
+            Result = []
+            Result = model.predict(x)
+            if Result == 0:
+                print("Play")
+            else:
+                print("Miss")
+            
 
 First_State = int(input("""If you want to analyze your video?
 press 1.
@@ -227,6 +248,9 @@ press 2.
 
 If learning Geometry Dash Miss image
 Press 3.
+
+If you gaming from real time
+Press 4
 """))
 
 if First_State == 1:
@@ -234,6 +258,9 @@ if First_State == 1:
     Vidio_Analyze(Video)
 elif First_State == 2:
     Real_Time()
+elif First_State == 4:
+    Game_play()
+
 elif First_State == 3:
     GmdMiss_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD Miss')
     GMD_Play_Folder = os.path.join(os.getcwd(), '..', 'Photo', 'GMD_Play')
