@@ -308,7 +308,7 @@ press 1.
 or real time play game and real time screen analyze.
 press 2.
 
-If learning Geometry Dash Miss image
+If learning Geometry Dash 'Play Game' and 'Nothing' image
 Press 3.
 
 If you gaming from real time
