@@ -147,10 +147,6 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 Game_Src_Click_pos = [379, 283]
 
 
-def Gray_Scale(img):
-    tf.image.rgb_to_grayscale(img, name=None)
-
-
 def Real_Time():
     bring_window()
     i = 0
