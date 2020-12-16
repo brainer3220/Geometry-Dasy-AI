@@ -1,23 +1,25 @@
 import glob
 import os
 import time
-from datetime import datetime  # datetime.now() 를 이용하여 학습 경과 시간 측정
+import datetime
 
 import cv2
 import mss
-import numpy as np
 import pyautogui as pag
+import numpy as np
+import pandas as pd
+
 import tensorflow as tf
-import tensorflow.keras
-from PIL import Image
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
+from tensorflow.keras.models import Sequential, Model
+
+from PIL import Image, ImageOps
 from PIL import ImageGrab
 
-# from keras.models import Sequential
-# from keras.models import Model
 
 np.set_printoptions(suppress=True)
-
-saver = tf.train.Saver
 
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
@@ -37,7 +39,48 @@ Replay_Meomry = 100000
 
 reword = 0
 
+SEED = 2020
+
 # Funciton
+
+def reduce_mem_usage(df):
+    start_mem = df.memory_usage().sum() / 1024**2
+    print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
+
+    for col in df.columns:
+        col_type = df[col].dtype
+    if col_type != object:
+            c_min = df[col].min()
+            c_max = df[col].max()
+            if str(col_type)[:3] == 'int':
+                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                    df[col] = df[col].astype(np.int8)
+                elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(np.uint8).max:
+                    df[col] = df[col].astype(np.uint8)
+                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                    df[col] = df[col].astype(np.int16)
+                elif c_min > np.iinfo(np.uint16).min and c_max < np.iinfo(np.uint16).max:
+                    df[col] = df[col].astype(np.uint16)
+                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                    df[col] = df[col].astype(np.int32)
+                elif c_min > np.iinfo(np.uint32).min and c_max < np.iinfo(np.uint32).max:
+                    df[col] = df[col].astype(np.uint32)                    
+                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                    df[col] = df[col].astype(np.int64)
+                elif c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(np.uint64).max:
+                    df[col] = df[col].astype(np.uint64)
+            elif str(col_type)[:5] == 'float':
+                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
+                    df[col] = df[col].astype(np.float16)
+                elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
+                    df[col] = df[col].astype(np.float32)
+                else:
+                    df[col] = df[col].astype(np.float64)
+
+    end_mem = df.memory_usage().sum() / 1024**2
+    print('Memory usage after optimization is: {:.2f} MB'.format(end_mem))
+    print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) / start_mem))
+    return df
 
 def Jump():
     """
@@ -87,50 +130,22 @@ def average_hash(fname, size=16):
     print(diff)
 
 
-def Convolution(img):
-    kernel = tf.Variable(
-        tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
-    Gray_Scale(img)
-    img = img.astype("float32")
-    # print(img.shape)
-    img = tf.nn.conv2d(np.expand_dims(img, 0),
-                       kernel,
-                       strides=[1, 15, 15, 1],
-                       padding="VALID")  # + Bias1
-    return img
-
-
-def Max_Pool(img):
-    img = tf.nn.max_pool(img,
-                         ksize=[1, 2, 2, 1],
-                         strides=[1, 2, 2, 1],
-                         padding="VALID")
-    return img
-
-
-Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
-
-# Function to get resolution.
-# Test it when you bring the emulator's resolution coordinates.
-# while True:
-#    x, y = pag.position()
-#    position_str = 'X: ' + str(x) + 'Y: ' + str(y)
-#    bring_window()
-#    print(position_str)
+def GetResolution():
+    """
+    Function to get resolution.
+    Test it when you bring the emulator's resolution coordinates.
+    """
+    while True:
+        x, y = pag.position()
+        position_str = 'X: ' + str(x) + 'Y: ' + str(y)
+        bring_window()
+        print(position_str)
 
 # Full resolution of the emulator
 Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
-
-sess = tf.Session()
-
-# Gray Scale
-
-
-def Gray_Scale(img):
-    tf.image.rgb_to_grayscale(img, name=None)
 
 
 def Real_Time():
@@ -198,10 +213,6 @@ def Real_Time():
             # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
-# loss = tf.reduce_mean(tf.square(y-Q_action))
-# Optimizer = tf.trainAdamsOptimizer(learning_rate)
-# training_op = optimizer.minize(loss)
-
 
 def Vidio_Analyze(Video):
     Vidcap = cv2.VideoCapture(Video)
@@ -235,10 +246,6 @@ def Game_Play_With_Learning():
 
 
 def Game_play():
-    from keras.models import load_model
-    from PIL import Image, ImageOps
-    from tensorflow.keras.preprocessing.image import img_to_array
-
     np.set_printoptions(suppress=True)
 
     model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
@@ -266,159 +273,77 @@ def Game_play():
             else:
                 print("Miss")
 
+def BinaryImageClassf():
+    model = Sequential()
+    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
+                        input_shape=(640, 360, 3)))
+    model.add(MaxPooling2D(pool_size=(65, 25)))
+    model.add(Dropout(0.25))
+    
+    model.add(Conv2D(60, 30, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Dropout(0.25))
+    
+    model.add(Conv2D(60, 25, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Dropout(0.25))
+    
+    model.add(Flatten())
+    model.add(Dense(256, activation = 'relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(128, activation = 'sigmoid'))
 
-First_State = int(
+    model.add(Dense(1, activation='softmax'))
+    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    return model
+
+
+if __name__ == "__main__":
+    First_State = int(
     input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
 press 2.
 
-If learning Geometry Dash Miss image
+If learning Geometry Dash 'Play Game' and 'Nothing' image
 Press 3.
 
 If you gaming from real time
 Press 4
 """))
+    
+    if First_State == 1:
+        Video = input("Please enter a video path and video name.")
+        Vidio_Analyze(Video)
 
-if First_State == 1:
-    Video = input("Please enter a video path and video name.")
-    Vidio_Analyze(Video)
-elif First_State == 2:
-    Real_Time()
-elif First_State == 4:
-    Game_play()
+    elif First_State == 2:
+        Real_Time()
 
-elif First_State == 3:
-    GmdMiss_Folder = os.path.join(os.getcwd(), "..", "Photo", "GMD Miss")
-    GMD_Play_Folder = os.path.join(os.getcwd(), "..", "Photo", "GMD_Play")
-    GmdMiss_List = os.listdir(GmdMiss_Folder)
-    GMD_Play_List = os.listdir(GMD_Play_Folder)
+    elif First_State == 4:
+        Game_play()
 
-    # Test that the file is read correctly
-    # cv2.imshow('img', img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    elif First_State == 3:
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        print("Load Dataset")
 
-    Batch_Size = 30
-    sess.run(tf.global_variables_initializer())
-    # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
-    GMD_Miss_Y = [0, 0, 1]
-    GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List), 1))
-    print(GMD_Miss_Y)
-    Img_Miss_List = []
-    Img_Play_List = []
+        # print(train_dataset.class_names)
+        print(train_dataset)
 
-    # print(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[1]), cv2.IMREAD_GRAYSCALE)))
+        # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
+        # cv2.waitKey(0)
 
-    for i in range(0, len(GmdMiss_List)):
-        print(i)
-        Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
-        Img = cv2.imread(Img)
-        Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-        Img = np.array(Img)
-        Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
-        Img_Miss_List.append(Img)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    # for i in range(0, len(GMD_Play_List)):
-    #     print(i)
-    #     Img = os.path.join(os.getcwd(), GMD_Play_Folder, GMD_Play_List[i])
-    #     Img = cv2.imread(Img)
-    #     Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-    #     Img = np.array(Img)
-    #     Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
-    #     Img_Play_List.append(Img)
-    i = 0
-    bias = np.ones((1, 1), dtype=float)
-    while True:
-        print(i)
-        Img = Img_Miss_List[i]
-        print(Img)
-        # Img = tf.reshape(Img, [4, 1])
-        print(Img)
-        # Img = cv2.resize(Img, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-        with tf.Session() as sess:
-            graph = tf.Graph()
-            with graph.as_default():
-                with tf.name_scope("Convolution"):
-                    Img = Convolution(Img)
-                with tf.name_scope("Relu_Function"):
-                    Img = tf.nn.relu(Img)
-                with tf.name_scope("MaxPool"):
-                    Img = Max_Pool(Img)
-                    print(Img.shape)
-                with tf.name_scope("Img_Fatten"):
-                    Img_Flatten = tf.reshape(Img, [-1, 30 * 58 * 3])
-                with tf.name_scope("Fully_Connected"):
-                    X = Img_Flatten  # img is X
-                with tf.name_scope("Output_layer"):
-                    # X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
-                    Y = tf.placeholder(tf.float32, shape=[None, 3])
-                    W = tf.Variable(tf.zeros(shape=[30 * 58 * 3, 3]))
-                    B = tf.Variable(tf.zeros(shape=[3]))
+        bin_img_clssf = BinaryImageClassf()
+        history = bin_img_clssf.fit(train_dataset,
+        validation_data=validation_dataset,
+        epochs=30,
+        batch_size=2,
+        callbacks=[tensorboard_callback])
 
-                    with tf.name_scope("Logits"):
-                        Logits = tf.matmul(Img_Flatten, W) + B
-                    with tf.name_scope("SoftMax"):
-                        Y_Pred = tf.nn.softmax(Logits)
+        model.save('model.h5')
 
-                #     lables is state num.
-                #     0: Nothing
-                #     1: Game play screen
-                #     2: Game over screen
-
-                with tf.name_scope("Learning"):
-                    with tf.name_scope("Reduce_Mean"):
-                        Loss = tf.reduce_mean(
-                            tf.nn.softmax_cross_entropy_with_logits_v2(
-                                logits=Logits, labels=GMD_Miss_Y))
-                    # with tf.name_scope("TrainStep"):
-                    #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
-                    with tf.name_scope("Optimizer"):
-                        Optimizer = tf.train.AdamOptimizer(Learning_Rate)
-                    with tf.name_scope("Train"):
-                        Train = Optimizer.minimize(loss=Loss)
-                    with tf.name_scope("Argmax_Compare"):
-                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1),
-                                                  tf.argmax(GMD_Miss_Y, 1))
-                    with tf.name_scope("Accuracy"):
-                        Accuracy = tf.reduce_mean(
-                            tf.cast(Predictive_Val, dtype=tf.float32))
-
-                i += 1
-
-                if i == len(GmdMiss_List):
-                    writer = tf.summary.FileWriter(
-                        "..\Graph\GMDmiss", graph=tf.get_default_graph())
-                    print(Img)
-                    print(i)
-                    saver.save(
-                        save_path="F:\Programing\Geomatry-Dasy-AI\Model\CNN",
-                        global_step=i,
-                    )
-                    writer.close()
-
-                    for k in range(1000):
-                        sess.run(fetches,
-                                 feed_dict=None,
-                                 options=None,
-                                 run_metadata=None)
-                    break
-
-            start_time = datetime.now()
-            # for k in range(30):
-            #     Total_Batch = int(len(GmdMiss_List) / Batch_Size)
-            # for Step in range(Total_Batch):
-            #     Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
-            # if k % 100 == 0:
-            #     print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
-            # End_Time = datetime.now()
-            #     saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
-            print(i)
-            if i == len(Img_Miss_List):
-                break
-                # # Accuracy 확인
-                # test_x_data = mnist.test.images    # 10000 X 784
-                # test_t_data = mnist.test.labels    # 10000 X 10
-                # accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
-                # print("\nAccuracy = ", accuracy_val)

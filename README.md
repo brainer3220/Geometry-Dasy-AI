@@ -6,18 +6,14 @@
 
 ### 📋Dependency
 
-- Python 3.6.8
-- Tensorflow 1.10.0
+- Python 3.7
+- Tensorflow 2.4.0
 - pyautogui
 - numpy
 - open-cv
 - mss
 - pag
-- BlueStack과 같은 Android Emulator
-
-#### More to come
-
-- Keras
+- Geometry Dash Environment
 
 ### GeometryDash_AI Directory
 
