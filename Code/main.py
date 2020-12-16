@@ -39,34 +39,34 @@ reword = 0
 
 # Funciton
 
-# Jump Function
-
-
 def Jump():
+    """
+    Jump Function
+    """
     pag.press("space")
 
 
-# Q Value Function
-
-
 def Q_Value(State, Action):
+    """
+    Q Value Function
+    """
     reword + (Discount * max(Q_next))
     # return
 
 
-# Click to Start Button
-
-
 def Click_Start():
+    """
+    Click to Start Button
+    """
     pag.moveTo(417, 257)  # X and y coordinates of the start button
     pag.mouseDown()
     pag.mouseUp()
 
 
-# Bring the emulator to the front
-
-
 def bring_window():
+    """
+    Bring the emulator to the front
+    """
     time.sleep(0.5)
     apple = """
     tell application "BlueStacks"
