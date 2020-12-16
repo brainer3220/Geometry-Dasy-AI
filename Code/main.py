@@ -12,7 +12,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D
+from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
 from tensorflow.keras.models import Sequential, Model
 
 from PIL import Image, ImageOps
