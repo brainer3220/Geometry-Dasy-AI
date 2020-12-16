@@ -275,8 +275,6 @@ def Game_play():
             else:
                 print("Miss")
 
-
-First_State = int(
 def BinaryImageClassf():
     model = Sequential()
     model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
@@ -300,6 +298,10 @@ def BinaryImageClassf():
     model.add(Dense(1, activation='softmax'))
     model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
     return model
+
+
+if __name__ == "__main__":
+    First_State = int(
     input("""If you want to analyze your video?
 press 1.
 
@@ -312,145 +314,38 @@ Press 3.
 If you gaming from real time
 Press 4
 """))
+    
+    if First_State == 1:
+        Video = input("Please enter a video path and video name.")
+        Vidio_Analyze(Video)
 
-if First_State == 1:
-    Video = input("Please enter a video path and video name.")
-    Vidio_Analyze(Video)
-elif First_State == 2:
-    Real_Time()
-elif First_State == 4:
-    Game_play()
+    elif First_State == 2:
+        Real_Time()
 
-elif First_State == 3:
-    GmdMiss_Folder = os.path.join(os.getcwd(), "..", "Photo", "GMD Miss")
-    GMD_Play_Folder = os.path.join(os.getcwd(), "..", "Photo", "GMD_Play")
-    GmdMiss_List = os.listdir(GmdMiss_Folder)
-    GMD_Play_List = os.listdir(GMD_Play_Folder)
+    elif First_State == 4:
+        Game_play()
 
-    # Test that the file is read correctly
-    # cv2.imshow('img', img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    elif First_State == 3:
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        print("Load Dataset")
 
-    Batch_Size = 30
-    sess.run(tf.global_variables_initializer())
-    # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
-    GMD_Miss_Y = [0, 0, 1]
-    GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List), 1))
-    print(GMD_Miss_Y)
-    Img_Miss_List = []
-    Img_Play_List = []
+        # print(train_dataset.class_names)
+        print(train_dataset)
 
-    # print(np.array(cv2.imread(os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[1]), cv2.IMREAD_GRAYSCALE)))
+        # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
+        # cv2.waitKey(0)
 
-    for i in range(0, len(GmdMiss_List)):
-        print(i)
-        Img = os.path.join(os.getcwd(), GmdMiss_Folder, GmdMiss_List[i])
-        Img = cv2.imread(Img)
-        Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-        Img = np.array(Img)
-        Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
-        Img_Miss_List.append(Img)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-    # for i in range(0, len(GMD_Play_List)):
-    #     print(i)
-    #     Img = os.path.join(os.getcwd(), GMD_Play_Folder, GMD_Play_List[i])
-    #     Img = cv2.imread(Img)
-    #     Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-    #     Img = np.array(Img)
-    #     Img = cv2.resize(Img, dsize=(1920, 1080), interpolation=cv2.INTER_AREA)
-    #     Img_Play_List.append(Img)
-    i = 0
-    bias = np.ones((1, 1), dtype=float)
-    while True:
-        print(i)
-        Img = Img_Miss_List[i]
-        print(Img)
-        # Img = tf.reshape(Img, [4, 1])
-        print(Img)
-        # Img = cv2.resize(Img, dsize=(960, 540), interpolation=cv2.INTER_AREA)
-        with tf.Session() as sess:
-            graph = tf.Graph()
-            with graph.as_default():
-                with tf.name_scope("Convolution"):
-                    Img = Convolution(Img)
-                with tf.name_scope("Relu_Function"):
-                    Img = tf.nn.relu(Img)
-                with tf.name_scope("MaxPool"):
-                    Img = Max_Pool(Img)
-                    print(Img.shape)
-                with tf.name_scope("Img_Fatten"):
-                    Img_Flatten = tf.reshape(Img, [-1, 30 * 58 * 3])
-                with tf.name_scope("Fully_Connected"):
-                    X = Img_Flatten  # img is X
-                with tf.name_scope("Output_layer"):
-                    # X = tf.placeholder(tf.float32, shape=[None, 30*58*3])
-                    Y = tf.placeholder(tf.float32, shape=[None, 3])
-                    W = tf.Variable(tf.zeros(shape=[30 * 58 * 3, 3]))
-                    B = tf.Variable(tf.zeros(shape=[3]))
+        bin_img_clssf = BinaryImageClassf()
+        history = bin_img_clssf.fit(train_dataset,
+        validation_data=validation_dataset,
+        epochs=30,
+        batch_size=2,
+        callbacks=[tensorboard_callback])
 
-                    with tf.name_scope("Logits"):
-                        Logits = tf.matmul(Img_Flatten, W) + B
-                    with tf.name_scope("SoftMax"):
-                        Y_Pred = tf.nn.softmax(Logits)
+        model.save('model.h5')
 
-                #     lables is state num.
-                #     0: Nothing
-                #     1: Game play screen
-                #     2: Game over screen
-
-                with tf.name_scope("Learning"):
-                    with tf.name_scope("Reduce_Mean"):
-                        Loss = tf.reduce_mean(
-                            tf.nn.softmax_cross_entropy_with_logits_v2(
-                                logits=Logits, labels=GMD_Miss_Y))
-                    # with tf.name_scope("TrainStep"):
-                    #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
-                    with tf.name_scope("Optimizer"):
-                        Optimizer = tf.train.AdamOptimizer(Learning_Rate)
-                    with tf.name_scope("Train"):
-                        Train = Optimizer.minimize(loss=Loss)
-                    with tf.name_scope("Argmax_Compare"):
-                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1),
-                                                  tf.argmax(GMD_Miss_Y, 1))
-                    with tf.name_scope("Accuracy"):
-                        Accuracy = tf.reduce_mean(
-                            tf.cast(Predictive_Val, dtype=tf.float32))
-
-                i += 1
-
-                if i == len(GmdMiss_List):
-                    writer = tf.summary.FileWriter(
-                        "..\Graph\GMDmiss", graph=tf.get_default_graph())
-                    print(Img)
-                    print(i)
-                    saver.save(
-                        save_path="F:\Programing\Geomatry-Dasy-AI\Model\CNN",
-                        global_step=i,
-                    )
-                    writer.close()
-
-                    for k in range(1000):
-                        sess.run(fetches,
-                                 feed_dict=None,
-                                 options=None,
-                                 run_metadata=None)
-                    break
-
-            start_time = datetime.now()
-            # for k in range(30):
-            #     Total_Batch = int(len(GmdMiss_List) / Batch_Size)
-            # for Step in range(Total_Batch):
-            #     Loss_Val, _ = sess.run([Loss, Train], feed_dict={X: Img_Miss_List, Y: GMD_Miss_Y})
-            # if k % 100 == 0:
-            #     print("Epoch = ", i, ",Step =", Step, ", Loss_Val = ", Loss_Val)
-            # End_Time = datetime.now()
-            #     saver.save(sess=sess, save_path='..\Model\GMDmissLearningData', global_step=None)
-            print(i)
-            if i == len(Img_Miss_List):
-                break
-                # # Accuracy 확인
-                # test_x_data = mnist.test.images    # 10000 X 784
-                # test_t_data = mnist.test.labels    # 10000 X 10
-                # accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
-                # print("\nAccuracy = ", accuracy_val)
