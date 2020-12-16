@@ -129,13 +129,16 @@ def average_hash(fname, size=16):
     print(diff)
 
 
-# Function to get resolution.
-# Test it when you bring the emulator's resolution coordinates.
-# while True:
-#    x, y = pag.position()
-#    position_str = 'X: ' + str(x) + 'Y: ' + str(y)
-#    bring_window()
-#    print(position_str)
+def GetResolution():
+    """
+    Function to get resolution.
+    Test it when you bring the emulator's resolution coordinates.
+    """
+    while True:
+        x, y = pag.position()
+        position_str = 'X: ' + str(x) + 'Y: ' + str(y)
+        bring_window()
+        print(position_str)
 
 # Full resolution of the emulator
 Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
