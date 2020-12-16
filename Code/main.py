@@ -1,7 +1,7 @@
 import glob
 import os
 import time
-from datetime import datetime  # datetime.now() 를 이용하여 학습 경과 시간 측정
+import datetime
 
 import cv2
 import mss
@@ -14,6 +14,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
 from tensorflow.keras.models import Sequential, Model
+from tensorflow.python.keras.models import load_model
 
 from PIL import Image, ImageOps
 from PIL import Image
