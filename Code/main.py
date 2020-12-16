@@ -1,19 +1,19 @@
+import glob
+import os
+import time
+from datetime import datetime  # datetime.now() 를 이용하여 학습 경과 시간 측정
+
+import cv2
+import mss
+import numpy as np
+import pyautogui as pag
 import tensorflow as tf
 import tensorflow.keras
-import pyautogui as pag
-import mss
-import cv2
-import numpy as np
-import time
-import os
-import glob
-from datetime import datetime  # datetime.now() 를 이용하여 학습 경과 시간 측정
+from PIL import Image, ImageGrab
 
 # from keras.models import Sequential
 # from keras.models import Model
 
-from PIL import Image
-from PIL import ImageGrab
 
 np.set_printoptions(suppress=True)
 
@@ -231,9 +231,9 @@ def Game_Play_With_Learning():
 
 
 def Game_play():
-    from tensorflow.keras.preprocessing.image import img_to_array
     from keras.models import load_model
     from PIL import Image, ImageOps
+    from tensorflow.keras.preprocessing.image import img_to_array
 
     np.set_printoptions(suppress=True)
 
