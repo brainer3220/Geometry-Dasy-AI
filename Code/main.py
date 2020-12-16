@@ -276,6 +276,29 @@ def Game_play():
 
 
 First_State = int(
+def BinaryImageClassf():
+    model = Sequential()
+    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
+                        input_shape=(960, 540, 3)))
+    model.add(MaxPooling2D(pool_size=(65, 25)))
+    model.add(Dropout(0.25))
+    
+    model.add(Conv2D(60, 30, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Dropout(0.25))
+    
+    model.add(Conv2D(60, 25, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Dropout(0.25))
+    
+    model.add(Flatten())
+    model.add(Dense(256, activation = 'relu'))
+    model.add(Dropout(0.5))
+    model.add(Dense(128, activation = 'sigmoid'))
+
+    model.add(Dense(1, activation='softmax'))
+    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    return model
     input("""If you want to analyze your video?
 press 1.
 
