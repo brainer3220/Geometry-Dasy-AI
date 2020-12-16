@@ -5,19 +5,22 @@ from datetime import datetime  # datetime.now() 를 이용하여 학습 경과 �
 
 import cv2
 import mss
-import numpy as np
 import pyautogui as pag
+import numpy as np
+import pandas as pd
+
 import tensorflow as tf
-import tensorflow.keras
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D
+from tensorflow.keras.models import Sequential, Model
+
+from PIL import Image, ImageOps
 from PIL import Image
 from PIL import ImageGrab
 
-# from keras.models import Sequential
-# from keras.models import Model
 
 np.set_printoptions(suppress=True)
-
-saver = tf.train.Saver
 
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
