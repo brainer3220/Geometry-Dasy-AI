@@ -40,6 +40,8 @@ Replay_Meomry = 100000
 
 reword = 0
 
+SEED = 2020
+
 # Funciton
 
 def reduce_mem_usage(df):
