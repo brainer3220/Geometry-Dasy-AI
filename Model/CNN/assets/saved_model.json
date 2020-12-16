@@ -17,12 +17,7 @@
                     "name": "input_1",
                     "class_name": "InputLayer",
                     "config": {
-                      "batch_input_shape": [
-                        null,
-                        224,
-                        224,
-                        3
-                      ],
+                      "batch_input_shape": [null, 224, 224, 3],
                       "dtype": "float32",
                       "sparse": false,
                       "ragged": false,
@@ -38,27 +33,12 @@
                       "trainable": true,
                       "dtype": "float32",
                       "padding": [
-                        [
-                          0,
-                          1
-                        ],
-                        [
-                          0,
-                          1
-                        ]
+                        [0, 1],
+                        [0, 1]
                       ],
                       "data_format": "channels_last"
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "input_1",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["input_1", 0, 0, {}]]]
                   },
                   {
                     "name": "Conv1",
@@ -68,20 +48,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 16,
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        2,
-                        2
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [2, 2],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -106,16 +77,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "Conv1_pad",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["Conv1_pad", 0, 0, {}]]]
                   },
                   {
                     "name": "bn_Conv1",
@@ -124,9 +86,7 @@
                       "name": "bn_Conv1",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -160,16 +120,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "Conv1",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["Conv1", 0, 0, {}]]]
                   },
                   {
                     "name": "Conv1_relu",
@@ -182,16 +133,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "bn_Conv1",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["bn_Conv1", 0, 0, {}]]]
                   },
                   {
                     "name": "expanded_conv_depthwise",
@@ -200,20 +142,11 @@
                       "name": "expanded_conv_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -239,16 +172,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "Conv1_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["Conv1_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "expanded_conv_depthwise_BN",
@@ -257,9 +181,7 @@
                       "name": "expanded_conv_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -293,16 +215,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "expanded_conv_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["expanded_conv_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "expanded_conv_depthwise_relu",
@@ -316,14 +229,7 @@
                       "threshold": 0
                     },
                     "inbound_nodes": [
-                      [
-                        [
-                          "expanded_conv_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
+                      [["expanded_conv_depthwise_BN", 0, 0, {}]]
                     ]
                   },
                   {
@@ -334,20 +240,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 8,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -373,14 +270,7 @@
                       "bias_constraint": null
                     },
                     "inbound_nodes": [
-                      [
-                        [
-                          "expanded_conv_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
+                      [["expanded_conv_depthwise_relu", 0, 0, {}]]
                     ]
                   },
                   {
@@ -390,9 +280,7 @@
                       "name": "expanded_conv_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -426,16 +314,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "expanded_conv_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["expanded_conv_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_expand",
@@ -445,20 +324,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 48,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -483,16 +353,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "expanded_conv_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["expanded_conv_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_expand_BN",
@@ -501,9 +362,7 @@
                       "name": "block_1_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -537,16 +396,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_expand_relu",
@@ -559,16 +409,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_pad",
@@ -578,27 +419,12 @@
                       "trainable": true,
                       "dtype": "float32",
                       "padding": [
-                        [
-                          0,
-                          1
-                        ],
-                        [
-                          0,
-                          1
-                        ]
+                        [0, 1],
+                        [0, 1]
                       ],
                       "data_format": "channels_last"
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_depthwise",
@@ -607,20 +433,11 @@
                       "name": "block_1_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        2,
-                        2
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [2, 2],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -646,16 +463,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_pad",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_pad", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_depthwise_BN",
@@ -664,9 +472,7 @@
                       "name": "block_1_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -700,16 +506,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_depthwise_relu",
@@ -722,16 +519,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_project",
@@ -741,20 +529,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 8,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -779,16 +558,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_1_project_BN",
@@ -797,9 +567,7 @@
                       "name": "block_1_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -833,16 +601,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_expand",
@@ -852,20 +611,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 48,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -890,16 +640,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_1_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_1_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_expand_BN",
@@ -908,9 +649,7 @@
                       "name": "block_2_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -944,16 +683,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_expand_relu",
@@ -966,16 +696,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_depthwise",
@@ -984,20 +705,11 @@
                       "name": "block_2_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -1023,16 +735,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_depthwise_BN",
@@ -1041,9 +744,7 @@
                       "name": "block_2_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1077,16 +778,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_depthwise_relu",
@@ -1099,16 +791,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_project",
@@ -1118,20 +801,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 8,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -1156,16 +830,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_project_BN",
@@ -1174,9 +839,7 @@
                       "name": "block_2_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1210,16 +873,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_2_add",
@@ -1231,18 +885,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_1_project_BN",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_2_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_1_project_BN", 0, 0, {}],
+                        ["block_2_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -1254,20 +898,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 48,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -1292,16 +927,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_2_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_2_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_expand_BN",
@@ -1310,9 +936,7 @@
                       "name": "block_3_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1346,16 +970,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_expand_relu",
@@ -1368,16 +983,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_pad",
@@ -1387,27 +993,12 @@
                       "trainable": true,
                       "dtype": "float32",
                       "padding": [
-                        [
-                          0,
-                          1
-                        ],
-                        [
-                          0,
-                          1
-                        ]
+                        [0, 1],
+                        [0, 1]
                       ],
                       "data_format": "channels_last"
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_depthwise",
@@ -1416,20 +1007,11 @@
                       "name": "block_3_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        2,
-                        2
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [2, 2],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -1455,16 +1037,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_pad",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_pad", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_depthwise_BN",
@@ -1473,9 +1046,7 @@
                       "name": "block_3_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1509,16 +1080,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_depthwise_relu",
@@ -1531,16 +1093,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_project",
@@ -1550,20 +1103,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 16,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -1588,16 +1132,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_3_project_BN",
@@ -1606,9 +1141,7 @@
                       "name": "block_3_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1642,16 +1175,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_expand",
@@ -1661,20 +1185,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 96,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -1699,16 +1214,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_3_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_3_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_expand_BN",
@@ -1717,9 +1223,7 @@
                       "name": "block_4_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1753,16 +1257,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_expand_relu",
@@ -1775,16 +1270,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_depthwise",
@@ -1793,20 +1279,11 @@
                       "name": "block_4_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -1832,16 +1309,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_depthwise_BN",
@@ -1850,9 +1318,7 @@
                       "name": "block_4_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -1886,16 +1352,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_depthwise_relu",
@@ -1908,16 +1365,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_project",
@@ -1927,20 +1375,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 16,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -1965,16 +1404,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_project_BN",
@@ -1983,9 +1413,7 @@
                       "name": "block_4_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2019,16 +1447,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_4_add",
@@ -2040,18 +1459,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_3_project_BN",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_4_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_3_project_BN", 0, 0, {}],
+                        ["block_4_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -2063,20 +1472,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 96,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -2101,16 +1501,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_4_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_4_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_expand_BN",
@@ -2119,9 +1510,7 @@
                       "name": "block_5_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2155,16 +1544,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_expand_relu",
@@ -2177,16 +1557,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_depthwise",
@@ -2195,20 +1566,11 @@
                       "name": "block_5_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -2234,16 +1596,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_depthwise_BN",
@@ -2252,9 +1605,7 @@
                       "name": "block_5_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2288,16 +1639,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_depthwise_relu",
@@ -2310,16 +1652,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_project",
@@ -2329,20 +1662,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 16,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -2367,16 +1691,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_project_BN",
@@ -2385,9 +1700,7 @@
                       "name": "block_5_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2421,16 +1734,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_5_add",
@@ -2442,18 +1746,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_4_add",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_5_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_4_add", 0, 0, {}],
+                        ["block_5_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -2465,20 +1759,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 96,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -2503,16 +1788,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_5_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_5_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_expand_BN",
@@ -2521,9 +1797,7 @@
                       "name": "block_6_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2557,16 +1831,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_expand_relu",
@@ -2579,16 +1844,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_pad",
@@ -2598,27 +1854,12 @@
                       "trainable": true,
                       "dtype": "float32",
                       "padding": [
-                        [
-                          0,
-                          1
-                        ],
-                        [
-                          0,
-                          1
-                        ]
+                        [0, 1],
+                        [0, 1]
                       ],
                       "data_format": "channels_last"
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_depthwise",
@@ -2627,20 +1868,11 @@
                       "name": "block_6_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        2,
-                        2
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [2, 2],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -2666,16 +1898,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_pad",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_pad", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_depthwise_BN",
@@ -2684,9 +1907,7 @@
                       "name": "block_6_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2720,16 +1941,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_depthwise_relu",
@@ -2742,16 +1954,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_project",
@@ -2761,20 +1964,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 24,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -2799,16 +1993,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_6_project_BN",
@@ -2817,9 +2002,7 @@
                       "name": "block_6_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2853,16 +2036,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_expand",
@@ -2872,20 +2046,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 144,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -2910,16 +2075,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_6_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_6_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_expand_BN",
@@ -2928,9 +2084,7 @@
                       "name": "block_7_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -2964,16 +2118,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_expand_relu",
@@ -2986,16 +2131,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_depthwise",
@@ -3004,20 +2140,11 @@
                       "name": "block_7_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -3043,16 +2170,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_depthwise_BN",
@@ -3061,9 +2179,7 @@
                       "name": "block_7_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3097,16 +2213,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_depthwise_relu",
@@ -3119,16 +2226,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_project",
@@ -3138,20 +2236,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 24,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -3176,16 +2265,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_project_BN",
@@ -3194,9 +2274,7 @@
                       "name": "block_7_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3230,16 +2308,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_7_add",
@@ -3251,18 +2320,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_6_project_BN",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_7_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_6_project_BN", 0, 0, {}],
+                        ["block_7_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -3274,20 +2333,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 144,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -3312,16 +2362,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_7_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_7_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_expand_BN",
@@ -3330,9 +2371,7 @@
                       "name": "block_8_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3366,16 +2405,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_expand_relu",
@@ -3388,16 +2418,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_depthwise",
@@ -3406,20 +2427,11 @@
                       "name": "block_8_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -3445,16 +2457,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_depthwise_BN",
@@ -3463,9 +2466,7 @@
                       "name": "block_8_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3499,16 +2500,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_depthwise_relu",
@@ -3521,16 +2513,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_project",
@@ -3540,20 +2523,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 24,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -3578,16 +2552,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_project_BN",
@@ -3596,9 +2561,7 @@
                       "name": "block_8_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3632,16 +2595,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_8_add",
@@ -3653,18 +2607,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_7_add",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_8_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_7_add", 0, 0, {}],
+                        ["block_8_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -3676,20 +2620,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 144,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -3714,16 +2649,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_8_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_8_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_expand_BN",
@@ -3732,9 +2658,7 @@
                       "name": "block_9_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3768,16 +2692,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_expand_relu",
@@ -3790,16 +2705,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_depthwise",
@@ -3808,20 +2714,11 @@
                       "name": "block_9_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -3847,16 +2744,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_depthwise_BN",
@@ -3865,9 +2753,7 @@
                       "name": "block_9_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -3901,16 +2787,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_depthwise_relu",
@@ -3923,16 +2800,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_project",
@@ -3942,20 +2810,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 24,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -3980,16 +2839,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_project_BN",
@@ -3998,9 +2848,7 @@
                       "name": "block_9_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4034,16 +2882,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_9_add",
@@ -4055,18 +2894,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_8_add",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_9_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_8_add", 0, 0, {}],
+                        ["block_9_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -4078,20 +2907,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 144,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -4116,16 +2936,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_9_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_9_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_expand_BN",
@@ -4134,9 +2945,7 @@
                       "name": "block_10_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4170,16 +2979,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_expand_relu",
@@ -4192,16 +2992,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_depthwise",
@@ -4210,20 +3001,11 @@
                       "name": "block_10_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -4249,16 +3031,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_depthwise_BN",
@@ -4267,9 +3040,7 @@
                       "name": "block_10_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4303,16 +3074,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_depthwise_relu",
@@ -4325,16 +3087,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_project",
@@ -4344,20 +3097,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 32,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -4382,16 +3126,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_10_project_BN",
@@ -4400,9 +3135,7 @@
                       "name": "block_10_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4436,16 +3169,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_expand",
@@ -4455,20 +3179,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 192,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -4493,16 +3208,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_10_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_10_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_expand_BN",
@@ -4511,9 +3217,7 @@
                       "name": "block_11_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4547,16 +3251,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_expand_relu",
@@ -4569,16 +3264,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_depthwise",
@@ -4587,20 +3273,11 @@
                       "name": "block_11_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -4626,16 +3303,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_depthwise_BN",
@@ -4644,9 +3312,7 @@
                       "name": "block_11_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4680,16 +3346,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_depthwise_relu",
@@ -4702,16 +3359,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_project",
@@ -4721,20 +3369,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 32,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -4759,16 +3398,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_project_BN",
@@ -4777,9 +3407,7 @@
                       "name": "block_11_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4813,16 +3441,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_11_add",
@@ -4834,18 +3453,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_10_project_BN",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_11_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_10_project_BN", 0, 0, {}],
+                        ["block_11_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -4857,20 +3466,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 192,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -4895,16 +3495,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_11_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_11_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_expand_BN",
@@ -4913,9 +3504,7 @@
                       "name": "block_12_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -4949,16 +3538,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_expand_relu",
@@ -4971,16 +3551,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_depthwise",
@@ -4989,20 +3560,11 @@
                       "name": "block_12_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -5028,16 +3590,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_depthwise_BN",
@@ -5046,9 +3599,7 @@
                       "name": "block_12_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5082,16 +3633,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_depthwise_relu",
@@ -5104,16 +3646,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_project",
@@ -5123,20 +3656,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 32,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -5161,16 +3685,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_project_BN",
@@ -5179,9 +3694,7 @@
                       "name": "block_12_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5215,16 +3728,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_12_add",
@@ -5236,18 +3740,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_11_add",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_12_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_11_add", 0, 0, {}],
+                        ["block_12_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -5259,20 +3753,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 192,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -5297,16 +3782,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_12_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_12_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_expand_BN",
@@ -5315,9 +3791,7 @@
                       "name": "block_13_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5351,16 +3825,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_expand_relu",
@@ -5373,16 +3838,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_pad",
@@ -5392,27 +3848,12 @@
                       "trainable": true,
                       "dtype": "float32",
                       "padding": [
-                        [
-                          0,
-                          1
-                        ],
-                        [
-                          0,
-                          1
-                        ]
+                        [0, 1],
+                        [0, 1]
                       ],
                       "data_format": "channels_last"
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_depthwise",
@@ -5421,20 +3862,11 @@
                       "name": "block_13_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        2,
-                        2
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [2, 2],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -5460,16 +3892,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_pad",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_pad", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_depthwise_BN",
@@ -5478,9 +3901,7 @@
                       "name": "block_13_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5514,16 +3935,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_depthwise_relu",
@@ -5536,16 +3948,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_project",
@@ -5555,20 +3958,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 56,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -5593,16 +3987,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_13_project_BN",
@@ -5611,9 +3996,7 @@
                       "name": "block_13_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5647,16 +4030,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_expand",
@@ -5666,20 +4040,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 336,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -5704,16 +4069,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_13_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_13_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_expand_BN",
@@ -5722,9 +4078,7 @@
                       "name": "block_14_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5758,16 +4112,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_expand_relu",
@@ -5780,16 +4125,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_depthwise",
@@ -5798,20 +4134,11 @@
                       "name": "block_14_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -5837,16 +4164,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_depthwise_BN",
@@ -5855,9 +4173,7 @@
                       "name": "block_14_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -5891,16 +4207,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_depthwise_relu",
@@ -5913,16 +4220,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_project",
@@ -5932,20 +4230,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 56,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -5970,16 +4259,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_project_BN",
@@ -5988,9 +4268,7 @@
                       "name": "block_14_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6024,16 +4302,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_14_add",
@@ -6045,18 +4314,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_13_project_BN",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_14_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_13_project_BN", 0, 0, {}],
+                        ["block_14_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -6068,20 +4327,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 336,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -6106,16 +4356,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_14_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_14_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_expand_BN",
@@ -6124,9 +4365,7 @@
                       "name": "block_15_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6160,16 +4399,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_expand_relu",
@@ -6182,16 +4412,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_depthwise",
@@ -6200,20 +4421,11 @@
                       "name": "block_15_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -6239,16 +4451,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_depthwise_BN",
@@ -6257,9 +4460,7 @@
                       "name": "block_15_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6293,16 +4494,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_depthwise_relu",
@@ -6315,16 +4507,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_project",
@@ -6334,20 +4517,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 56,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -6372,16 +4546,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_project_BN",
@@ -6390,9 +4555,7 @@
                       "name": "block_15_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6426,16 +4589,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_project", 0, 0, {}]]]
                   },
                   {
                     "name": "block_15_add",
@@ -6447,18 +4601,8 @@
                     },
                     "inbound_nodes": [
                       [
-                        [
-                          "block_14_add",
-                          0,
-                          0,
-                          {}
-                        ],
-                        [
-                          "block_15_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
+                        ["block_14_add", 0, 0, {}],
+                        ["block_15_project_BN", 0, 0, {}]
                       ]
                     ]
                   },
@@ -6470,20 +4614,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 336,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -6508,16 +4643,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_15_add",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_15_add", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_expand_BN",
@@ -6526,9 +4652,7 @@
                       "name": "block_16_expand_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6562,16 +4686,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_expand",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_expand", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_expand_relu",
@@ -6584,16 +4699,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_expand_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_expand_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_depthwise",
@@ -6602,20 +4708,11 @@
                       "name": "block_16_depthwise",
                       "trainable": true,
                       "dtype": "float32",
-                      "kernel_size": [
-                        3,
-                        3
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [3, 3],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "bias_initializer": {
@@ -6641,16 +4738,7 @@
                       "depthwise_regularizer": null,
                       "depthwise_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_expand_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_expand_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_depthwise_BN",
@@ -6659,9 +4747,7 @@
                       "name": "block_16_depthwise_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6695,16 +4781,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_depthwise",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_depthwise", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_depthwise_relu",
@@ -6717,16 +4794,7 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_depthwise_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_depthwise_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_project",
@@ -6736,20 +4804,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 112,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "same",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -6774,16 +4833,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_depthwise_relu",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_depthwise_relu", 0, 0, {}]]]
                   },
                   {
                     "name": "block_16_project_BN",
@@ -6792,9 +4842,7 @@
                       "name": "block_16_project_BN",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6828,16 +4876,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_project",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_project", 0, 0, {}]]]
                   },
                   {
                     "name": "Conv_1",
@@ -6847,20 +4886,11 @@
                       "trainable": true,
                       "dtype": "float32",
                       "filters": 1280,
-                      "kernel_size": [
-                        1,
-                        1
-                      ],
-                      "strides": [
-                        1,
-                        1
-                      ],
+                      "kernel_size": [1, 1],
+                      "strides": [1, 1],
                       "padding": "valid",
                       "data_format": "channels_last",
-                      "dilation_rate": [
-                        1,
-                        1
-                      ],
+                      "dilation_rate": [1, 1],
                       "activation": "linear",
                       "use_bias": false,
                       "kernel_initializer": {
@@ -6885,16 +4915,7 @@
                       "kernel_constraint": null,
                       "bias_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "block_16_project_BN",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["block_16_project_BN", 0, 0, {}]]]
                   },
                   {
                     "name": "Conv_1_bn",
@@ -6903,9 +4924,7 @@
                       "name": "Conv_1_bn",
                       "trainable": true,
                       "dtype": "float32",
-                      "axis": [
-                        3
-                      ],
+                      "axis": [3],
                       "momentum": 0.999,
                       "epsilon": 0.001,
                       "center": true,
@@ -6939,16 +4958,7 @@
                       "beta_constraint": null,
                       "gamma_constraint": null
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "Conv_1",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["Conv_1", 0, 0, {}]]]
                   },
                   {
                     "name": "out_relu",
@@ -6961,38 +4971,12 @@
                       "negative_slope": 0,
                       "threshold": 0
                     },
-                    "inbound_nodes": [
-                      [
-                        [
-                          "Conv_1_bn",
-                          0,
-                          0,
-                          {}
-                        ]
-                      ]
-                    ]
+                    "inbound_nodes": [[["Conv_1_bn", 0, 0, {}]]]
                   }
                 ],
-                "input_layers": [
-                  [
-                    "input_1",
-                    0,
-                    0
-                  ]
-                ],
-                "output_layers": [
-                  [
-                    "out_relu",
-                    0,
-                    0
-                  ]
-                ],
-                "batch_input_shape": [
-                  null,
-                  224,
-                  224,
-                  3
-                ]
+                "input_layers": [["input_1", 0, 0]],
+                "output_layers": [["out_relu", 0, 0]],
+                "batch_input_shape": [null, 224, 224, 3]
               }
             },
             {
@@ -7005,12 +4989,7 @@
               }
             }
           ],
-          "batch_input_shape": [
-            null,
-            224,
-            224,
-            3
-          ]
+          "batch_input_shape": [null, 224, 224, 3]
         }
       },
       {
@@ -7023,10 +5002,7 @@
               "config": {
                 "name": "dense_Dense5",
                 "trainable": true,
-                "batch_input_shape": [
-                  null,
-                  1280
-                ],
+                "batch_input_shape": [null, 1280],
                 "dtype": "float32",
                 "units": 100,
                 "activation": "relu",
