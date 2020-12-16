@@ -9,7 +9,8 @@ import numpy as np
 import pyautogui as pag
 import tensorflow as tf
 import tensorflow.keras
-from PIL import Image, ImageGrab
+from PIL import Image
+from PIL import ImageGrab
 
 # from keras.models import Sequential
 # from keras.models import Model
