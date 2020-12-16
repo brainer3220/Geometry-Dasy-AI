@@ -129,29 +129,6 @@ def average_hash(fname, size=16):
     print(diff)
 
 
-def Convolution(img):
-    kernel = tf.Variable(
-        tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
-    Gray_Scale(img)
-    img = img.astype("float32")
-    # print(img.shape)
-    img = tf.nn.conv2d(np.expand_dims(img, 0),
-                       kernel,
-                       strides=[1, 15, 15, 1],
-                       padding="VALID")  # + Bias1
-    return img
-
-
-def Max_Pool(img):
-    img = tf.nn.max_pool(img,
-                         ksize=[1, 2, 2, 1],
-                         strides=[1, 2, 2, 1],
-                         padding="VALID")
-    return img
-
-
-Pixel_X = tf.placeholder(tf.float32, [None, 128, 128])
-
 # Function to get resolution.
 # Test it when you bring the emulator's resolution coordinates.
 # while True:
@@ -165,10 +142,6 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
-
-sess = tf.Session()
-
-# Gray Scale
 
 
 def Gray_Scale(img):
@@ -240,10 +213,6 @@ def Real_Time():
             # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
-# loss = tf.reduce_mean(tf.square(y-Q_action))
-# Optimizer = tf.trainAdamsOptimizer(learning_rate)
-# training_op = optimizer.minize(loss)
-
 
 def Vidio_Analyze(Video):
     Vidcap = cv2.VideoCapture(Video)
@@ -277,10 +246,6 @@ def Game_Play_With_Learning():
 
 
 def Game_play():
-    from keras.models import load_model
-    from PIL import Image, ImageOps
-    from tensorflow.keras.preprocessing.image import img_to_array
-
     np.set_printoptions(suppress=True)
 
     model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
