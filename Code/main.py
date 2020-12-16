@@ -15,7 +15,6 @@ from PIL import ImageGrab
 # from keras.models import Sequential
 # from keras.models import Model
 
-
 np.set_printoptions(suppress=True)
 
 saver = tf.train.Saver
@@ -89,18 +88,23 @@ def average_hash(fname, size=16):
 
 
 def Convolution(img):
-    kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
+    kernel = tf.Variable(
+        tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
     Gray_Scale(img)
     img = img.astype("float32")
     # print(img.shape)
-    img = tf.nn.conv2d(
-        np.expand_dims(img, 0), kernel, strides=[1, 15, 15, 1], padding="VALID"
-    )  # + Bias1
+    img = tf.nn.conv2d(np.expand_dims(img, 0),
+                       kernel,
+                       strides=[1, 15, 15, 1],
+                       padding="VALID")  # + Bias1
     return img
 
 
 def Max_Pool(img):
-    img = tf.nn.max_pool(img, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="VALID")
+    img = tf.nn.max_pool(img,
+                         ksize=[1, 2, 2, 1],
+                         strides=[1, 2, 2, 1],
+                         padding="VALID")
     return img
 
 
@@ -141,15 +145,15 @@ def Real_Time():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(
-                Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA
-            )
+            Game_Scr = cv2.resize(Game_Scr,
+                                  dsize=(960, 540),
+                                  interpolation=cv2.INTER_AREA)
             # Game_Scr = np.ravel(Game_Scr)
 
-            GMD_Model = os.path.join(os.getcwd(), "Model", "CNN", "saved_model.pb")
-            GMD_Model_Keras = os.path.join(
-                os.getcwd(), "..", "Model", "Keras", "keras_model.h5"
-            )
+            GMD_Model = os.path.join(os.getcwd(), "Model", "CNN",
+                                     "saved_model.pb")
+            GMD_Model_Keras = os.path.join(os.getcwd(), "..", "Model", "Keras",
+                                           "keras_model.h5")
 
             # model = saver.restore(sess, GMD_Model)
             data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
@@ -182,8 +186,7 @@ def Real_Time():
                         Gmd = Max_Pool(Gmd)
                     if i == 1:
                         writer = tf.summary.FileWriter(
-                            "..\Graph\GMDmiss", graph=tf.get_default_graph()
-                        )
+                            "..\Graph\GMDmiss", graph=tf.get_default_graph())
                         writer.close()
             print(Gmd.shape)
             print(Gmd)
@@ -248,9 +251,9 @@ def Game_play():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(
-                Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA
-            )
+            Game_Scr = cv2.resize(Game_Scr,
+                                  dsize=(960, 540),
+                                  interpolation=cv2.INTER_AREA)
             x = np.array(Game_Scr).reshape(-1, 1)
 
             size = (224, 224)
@@ -265,8 +268,7 @@ def Game_play():
 
 
 First_State = int(
-    input(
-        """If you want to analyze your video?
+    input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -277,9 +279,7 @@ Press 3.
 
 If you gaming from real time
 Press 4
-"""
-    )
-)
+"""))
 
 if First_State == 1:
     Video = input("Please enter a video path and video name.")
@@ -371,9 +371,7 @@ elif First_State == 3:
                     with tf.name_scope("Reduce_Mean"):
                         Loss = tf.reduce_mean(
                             tf.nn.softmax_cross_entropy_with_logits_v2(
-                                logits=Logits, labels=GMD_Miss_Y
-                            )
-                        )
+                                logits=Logits, labels=GMD_Miss_Y))
                     # with tf.name_scope("TrainStep"):
                     #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
                     with tf.name_scope("Optimizer"):
@@ -381,20 +379,17 @@ elif First_State == 3:
                     with tf.name_scope("Train"):
                         Train = Optimizer.minimize(loss=Loss)
                     with tf.name_scope("Argmax_Compare"):
-                        Predictive_Val = tf.equal(
-                            tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1)
-                        )
+                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1),
+                                                  tf.argmax(GMD_Miss_Y, 1))
                     with tf.name_scope("Accuracy"):
                         Accuracy = tf.reduce_mean(
-                            tf.cast(Predictive_Val, dtype=tf.float32)
-                        )
+                            tf.cast(Predictive_Val, dtype=tf.float32))
 
                 i += 1
 
                 if i == len(GmdMiss_List):
                     writer = tf.summary.FileWriter(
-                        "..\Graph\GMDmiss", graph=tf.get_default_graph()
-                    )
+                        "..\Graph\GMDmiss", graph=tf.get_default_graph())
                     print(Img)
                     print(i)
                     saver.save(
@@ -404,9 +399,10 @@ elif First_State == 3:
                     writer.close()
 
                     for k in range(1000):
-                        sess.run(
-                            fetches, feed_dict=None, options=None, run_metadata=None
-                        )
+                        sess.run(fetches,
+                                 feed_dict=None,
+                                 options=None,
+                                 run_metadata=None)
                     break
 
             start_time = datetime.now()
