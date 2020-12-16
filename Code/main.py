@@ -39,6 +39,8 @@ reword = 0
 # Funciton
 
 # Jump Function
+
+
 def Jump():
     pag.press("space")
 
@@ -80,16 +82,21 @@ def average_hash(fname, size=16):
     diff = 1 * (pixels > avg)
     print(diff)
 
+
 def Convolution(img):
-    kernel = tf.Variable(tf.truncated_normal(shape=[180, 180, 3, 3], stddev=0.1))
+    kernel = tf.Variable(tf.truncated_normal(
+        shape=[180, 180, 3, 3], stddev=0.1))
     Gray_Scale(img)
     img = img.astype('float32')
     # print(img.shape)
-    img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[ 1, 15, 15, 1], padding='VALID')  # + Bias1
+    img = tf.nn.conv2d(np.expand_dims(img, 0), kernel, strides=[
+                       1, 15, 15, 1], padding='VALID')  # + Bias1
     return img
 
+
 def Max_Pool(img):
-    img = tf.nn.max_pool(img, ksize=[1,2,2,1] , strides=[1,2,2,1], padding='VALID')
+    img = tf.nn.max_pool(img, ksize=[1, 2, 2, 1], strides=[
+                         1, 2, 2, 1], padding='VALID')
     return img
 
 
@@ -112,16 +119,19 @@ Game_Src_Click_pos = [379, 283]
 sess = tf.Session()
 
 # Gray Scale
+
+
 def Gray_Scale(img):
-        tf.image.rgb_to_grayscale(
-            img,
-            name=None)
+    tf.image.rgb_to_grayscale(
+        img,
+        name=None)
+
 
 def Real_Time():
     bring_window()
     i = 0
     while True:
-        i+=1
+        i += 1
         with mss.mss() as sct:
             Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
@@ -129,11 +139,14 @@ def Real_Time():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA)
+            Game_Scr = cv2.resize(Game_Scr, dsize=(
+                960, 540), interpolation=cv2.INTER_AREA)
             # Game_Scr = np.ravel(Game_Scr)
 
-            GMD_Model = os.path.join(os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
-            GMD_Model_Keras = os.path.join(os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
+            GMD_Model = os.path.join(
+                os.getcwd(), 'Model', 'CNN', 'saved_model.pb')
+            GMD_Model_Keras = os.path.join(
+                os.getcwd(), '..', 'Model', 'Keras', 'keras_model.h5')
 
             # model = saver.restore(sess, GMD_Model)
             data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
@@ -165,7 +178,8 @@ def Real_Time():
                     with tf.name_scope("MaxPool"):
                         Gmd = Max_Pool(Gmd)
                     if i == 1:
-                        writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                        writer = tf.summary.FileWriter(
+                            '..\Graph\GMDmiss', graph=tf.get_default_graph())
                         writer.close()
             print(Gmd.shape)
             print(Gmd)
@@ -192,20 +206,21 @@ def Vidio_Analyze(Video):
         print('Read a new frame: ', success)
         count += 1
 
+
 def Game_Play_With_Learning():
     Num_Of_Play_Time = int(input("Press number from Game Time."))
     while True:
-            Real_Time()
-            Play_Time = time.time() # Game start time
-            Jump()
+        Real_Time()
+        Play_Time = time.time()  # Game start time
+        Jump()
 
-            # if:        # if ended from One of game, up to Play Time.
-            #
-            #     Num_Of_Play_Time += 1
-            #     Play_Time = time.time() - Play_Time # Playtime for one game
+        # if:        # if ended from One of game, up to Play Time.
+        #
+        #     Num_Of_Play_Time += 1
+        #     Play_Time = time.time() - Play_Time # Playtime for one game
 
-            if epoch > Play_Time:
-                    break
+        if epoch > Play_Time:
+            break
 # def Play_Learning:
 
 
@@ -218,7 +233,7 @@ def Game_play():
     model = load_model('../Model/Keras/keras_model.h5', custom_objects=None)
 
     while True:
-       with mss.mss() as sct:
+        with mss.mss() as sct:
             Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
             # Below is a test to see if you are capturing the screen of the emulator.
@@ -238,7 +253,7 @@ def Game_play():
                 print("Play")
             else:
                 print("Miss")
-            
+
 
 First_State = int(input("""If you want to analyze your video?
 press 1.
@@ -275,7 +290,7 @@ elif First_State == 3:
     Batch_Size = 30
     sess.run(tf.global_variables_initializer())
     # saver.restore(sess, '..\model\CheckPoint\GMDmissData')
-    GMD_Miss_Y = [0,0,1]
+    GMD_Miss_Y = [0, 0, 1]
     GMD_Miss_Y = np.tile(GMD_Miss_Y, (len(GmdMiss_List), 1))
     print(GMD_Miss_Y)
     Img_Miss_List = []
@@ -341,7 +356,8 @@ elif First_State == 3:
 
                 with tf.name_scope("Learning"):
                     with tf.name_scope("Reduce_Mean"):
-                        Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=Logits, labels=GMD_Miss_Y))
+                        Loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+                            logits=Logits, labels=GMD_Miss_Y))
                     # with tf.name_scope("TrainStep"):
                     #     Train_Step = tf.train.GradientDescentOptimizer(0.5).minimize(Loss)
                     with tf.name_scope("Optimizer"):
@@ -349,21 +365,26 @@ elif First_State == 3:
                     with tf.name_scope("Train"):
                         Train = Optimizer.minimize(loss=Loss)
                     with tf.name_scope("Argmax_Compare"):
-                        Predictive_Val = tf.equal(tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
+                        Predictive_Val = tf.equal(
+                            tf.argmax(Y_Pred, 1), tf.argmax(GMD_Miss_Y, 1))
                     with tf.name_scope("Accuracy"):
-                        Accuracy = tf.reduce_mean(tf.cast(Predictive_Val, dtype=tf.float32))
+                        Accuracy = tf.reduce_mean(
+                            tf.cast(Predictive_Val, dtype=tf.float32))
 
-                i+=1
+                i += 1
 
                 if i == len(GmdMiss_List):
-                    writer = tf.summary.FileWriter('..\Graph\GMDmiss', graph=tf.get_default_graph())
+                    writer = tf.summary.FileWriter(
+                        '..\Graph\GMDmiss', graph=tf.get_default_graph())
                     print(Img)
                     print(i)
-                    saver.save(save_path='F:\Programing\Geomatry-Dasy-AI\Model\CNN', global_step=i)
+                    saver.save(
+                        save_path='F:\Programing\Geomatry-Dasy-AI\Model\CNN', global_step=i)
                     writer.close()
 
                     for k in range(1000):
-                        sess.run(fetches, feed_dict=None, options=None, run_metadata=None)
+                        sess.run(fetches, feed_dict=None,
+                                 options=None, run_metadata=None)
                     break
 
             start_time = datetime.now()
@@ -378,8 +399,8 @@ elif First_State == 3:
             print(i)
             if i == len(Img_Miss_List):
                 break
-                    # # Accuracy 확인
-                    # test_x_data = mnist.test.images    # 10000 X 784
-                    # test_t_data = mnist.test.labels    # 10000 X 10
-                    # accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
-                    # print("\nAccuracy = ", accuracy_val)
+                # # Accuracy 확인
+                # test_x_data = mnist.test.images    # 10000 X 784
+                # test_t_data = mnist.test.labels    # 10000 X 10
+                # accuracy_val = sess.run(accuracy, feed_dict={X: test_x_data, T: test_t_data})
+                # print("\nAccuracy = ", accuracy_val)
