@@ -18,7 +18,6 @@ from tensorflow.keras.models import Sequential, Model
 from PIL import Image, ImageOps
 from PIL import ImageGrab
 
-
 np.set_printoptions(suppress=True)
 
 Epsilon = 1  # Random probability
@@ -39,7 +38,9 @@ Replay_Meomry = 100000
 
 reword = 0
 
-SEED = 2020
+RANDOM_STATE = 2020
+
+tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
 
@@ -286,8 +287,8 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
