@@ -43,6 +43,7 @@ SEED = 2020
 
 # Funciton
 
+
 def reduce_mem_usage(df):
     start_mem = df.memory_usage().sum() / 1024**2
     print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
@@ -50,37 +51,39 @@ def reduce_mem_usage(df):
     for col in df.columns:
         col_type = df[col].dtype
     if col_type != object:
-            c_min = df[col].min()
-            c_max = df[col].max()
-            if str(col_type)[:3] == 'int':
-                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
-                    df[col] = df[col].astype(np.int8)
-                elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(np.uint8).max:
-                    df[col] = df[col].astype(np.uint8)
-                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
-                    df[col] = df[col].astype(np.int16)
-                elif c_min > np.iinfo(np.uint16).min and c_max < np.iinfo(np.uint16).max:
-                    df[col] = df[col].astype(np.uint16)
-                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
-                    df[col] = df[col].astype(np.int32)
-                elif c_min > np.iinfo(np.uint32).min and c_max < np.iinfo(np.uint32).max:
-                    df[col] = df[col].astype(np.uint32)                    
-                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
-                    df[col] = df[col].astype(np.int64)
-                elif c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(np.uint64).max:
-                    df[col] = df[col].astype(np.uint64)
-            elif str(col_type)[:5] == 'float':
-                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
-                    df[col] = df[col].astype(np.float16)
-                elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
-                    df[col] = df[col].astype(np.float32)
-                else:
-                    df[col] = df[col].astype(np.float64)
+        c_min = df[col].min()
+        c_max = df[col].max()
+        if str(col_type)[:3] == 'int':
+            if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                df[col] = df[col].astype(np.int8)
+            elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(np.uint8).max:
+                df[col] = df[col].astype(np.uint8)
+            elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                df[col] = df[col].astype(np.int16)
+            elif c_min > np.iinfo(np.uint16).min and c_max < np.iinfo(np.uint16).max:
+                df[col] = df[col].astype(np.uint16)
+            elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                df[col] = df[col].astype(np.int32)
+            elif c_min > np.iinfo(np.uint32).min and c_max < np.iinfo(np.uint32).max:
+                df[col] = df[col].astype(np.uint32)
+            elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                df[col] = df[col].astype(np.int64)
+            elif c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(np.uint64).max:
+                df[col] = df[col].astype(np.uint64)
+        elif str(col_type)[:5] == 'float':
+            if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
+                df[col] = df[col].astype(np.float16)
+            elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
+                df[col] = df[col].astype(np.float32)
+            else:
+                df[col] = df[col].astype(np.float64)
 
     end_mem = df.memory_usage().sum() / 1024**2
     print('Memory usage after optimization is: {:.2f} MB'.format(end_mem))
-    print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) / start_mem))
+    print('Decreased by {:.1f}%'.format(
+        100 * (start_mem - end_mem) / start_mem))
     return df
+
 
 def Jump():
     """
@@ -140,6 +143,7 @@ def GetResolution():
         position_str = 'X: ' + str(x) + 'Y: ' + str(y)
         BringWindow()
         print(position_str)
+
 
 # Full resolution of the emulator
 Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
@@ -213,7 +217,6 @@ def RealTime():
             # model.add(Conv2D(64, (3, 3), activation='relu'))
 
 
-
 def VideoAnalyze(Video):
     Vidcap = cv2.VideoCapture(Video)
     success, image = Vidcap.read()
@@ -273,34 +276,36 @@ def GamePlay():
             else:
                 print("Miss")
 
+
 def BinaryImageClassf():
     model = Sequential()
     model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                        input_shape=(640, 360, 3)))
+                     input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25)))
     model.add(Dropout(0.25))
-    
+
     model.add(Conv2D(60, 30, 3, padding='same'))
     model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.25))
-    
+
     model.add(Conv2D(60, 25, 3, padding='same'))
     model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.25))
-    
+
     model.add(Flatten())
-    model.add(Dense(256, activation = 'relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(128, activation = 'sigmoid'))
+    model.add(Dense(128, activation='sigmoid'))
 
     model.add(Dense(1, activation='softmax'))
-    model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy',
+                  optimizer='sgd', metrics=['accuracy'])
     return model
 
 
 if __name__ == "__main__":
     First_State = int(
-    input("""If you want to analyze your video?
+        input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -312,7 +317,7 @@ Press 3.
 If you gaming from real time
 Press 4
 """))
-    
+
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
         VideoAnalyze(Video)
@@ -324,8 +329,10 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
@@ -336,14 +343,14 @@ Press 4
         # cv2.waitKey(0)
 
         log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            log_dir=log_dir, histogram_freq=1)
 
         bin_img_clssf = BinaryImageClassf()
         history = bin_img_clssf.fit(train_dataset,
-        validation_data=validation_dataset,
-        epochs=30,
-        batch_size=2,
-        callbacks=[tensorboard_callback])
+                                    validation_data=validation_dataset,
+                                    epochs=30,
+                                    batch_size=2,
+                                    callbacks=[tensorboard_callback])
 
         model.save('model.h5')
-
