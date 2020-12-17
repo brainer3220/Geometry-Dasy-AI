@@ -226,7 +226,7 @@ def VideoAnalyze(Video):
         count += 1
 
 
-def Game_Play_With_Learning():
+def GamePlayWithLearning():
     Num_Of_Play_Time = int(input("Press number from Game Time."))
     while True:
         RealTime()
