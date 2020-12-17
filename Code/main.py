@@ -113,68 +113,29 @@ Game_Src_Click_pos = [379, 283]
 
 def RealTime():
     BringWindow()
-    i = 0
+    isGamePlay = load_model('Model\\20201218-003432model.h5')
+    isStart = 0
+
     while True:
-        i += 1
         with mss.mss() as sct:
             Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
 
-            # Below is a test to see if you are capturing the screen of the emulator.
+            """Below is a test to see if you are capturing the screen of the emulator."""
             # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(0)
+            # cv2.waitKey(1)
 
-            Game_Scr = cv2.resize(Game_Scr,
-                                  dsize=(960, 540),
-                                  interpolation=cv2.INTER_AREA)
-            # Game_Scr = np.ravel(Game_Scr)
+            Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
 
-            GMD_Model = os.path.join(os.getcwd(), "Model", "CNN",
-                                     "saved_model.pb")
-            GMD_Model_Keras = os.path.join(os.getcwd(), "..", "Model", "Keras",
-                                           "keras_model.h5")
+            if (tf.math.argmax(isGamePlay.predict(Game_Scr), axis=1) == 1) == True:
+                isStart += 1
+                print('Play...')
+                return 1
 
-            # model = saver.restore(sess, GMD_Model)
-            data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
-
-            # Replace this with the path to your image
-            image = Image.open(Game_Scr)
-
-            # Make sure to resize all images to 224, 224 otherwise they won't fit in the array
-            image = image.resize((960, 540))
-            image_array = np.asarray(image)
-
-            # Normalize the image
-            normalized_image_array = image_array / 255.0
-
-            # Load the image into the array
-            data[0] = normalized_image_array
-
-            # run the inference
-            prediction = model.predict(data)
-            print(prediction)
-
-            with tf.Session() as sess:
-                graph = tf.Graph()
-                with graph.as_default():
-                    with tf.name_scope("Convolution"):
-                        Gmd = Convolution(Game_Scr)
-                    with tf.name_scope("Relu_Function"):
-                        Gmd = tf.nn.relu(Gmd)
-                    with tf.name_scope("MaxPool"):
-                        Gmd = Max_Pool(Gmd)
-                    if i == 1:
-                        writer = tf.summary.FileWriter(
-                            "..\Graph\GMDmiss", graph=tf.get_default_graph())
-                        writer.close()
-            print(Gmd.shape)
-            print(Gmd)
-            # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(0)
-
-            # CNN
-            # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-            # model.add(Conv2D(64, (3, 3), activation='relu'))
-
+            elif isStart > 1:
+                print('What are you doing?')
+                return 0
+            else:
+                print("Go!")
 
 
 def VideoAnalyze(Video):
