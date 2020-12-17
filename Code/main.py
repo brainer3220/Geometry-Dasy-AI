@@ -42,14 +42,21 @@ RANDOM_STATE = 2020
 
 tf.random.set_seed(RANDOM_STATE)
 
-# Funciton
 
+# Funciton
 
 def Jump():
     """
     Jump Function
     """
-    pag.press("space")
+    pag.press("up")
+
+
+def Retry():
+    """
+    Retry Funtion
+    """
+    pag.press('space')
 
 
 def Q_Value(State, Action):
