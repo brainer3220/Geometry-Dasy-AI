@@ -106,7 +106,7 @@ def ClickStart():
     pag.mouseUp()
 
 
-def bring_window():
+def BringWindow():
     """
     Bring the emulator to the front
     """
@@ -138,7 +138,7 @@ def GetResolution():
     while True:
         x, y = pag.position()
         position_str = 'X: ' + str(x) + 'Y: ' + str(y)
-        bring_window()
+        BringWindow()
         print(position_str)
 
 # Full resolution of the emulator
@@ -148,8 +148,8 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 Game_Src_Click_pos = [379, 283]
 
 
-def Real_Time():
-    bring_window()
+def RealTime():
+    BringWindow()
     i = 0
     while True:
         i += 1
