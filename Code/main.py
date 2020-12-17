@@ -245,7 +245,7 @@ def Game_Play_With_Learning():
 # def Play_Learning:
 
 
-def Game_play():
+def GamePlay():
     np.set_printoptions(suppress=True)
 
     model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
@@ -321,7 +321,7 @@ Press 4
         Real_Time()
 
     elif First_State == 4:
-        Game_play()
+        GamePlay()
 
     elif First_State == 3:
         train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=SEED, label_mode='binary', image_size=(640, 360))
