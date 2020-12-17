@@ -27,7 +27,7 @@ np.set_printoptions(suppress=True)
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
 nbActions = 2  # Number of actions (jump, wait)
-Epoch = 1001  # Game repeat count
+EPOCH = 1001  # Game repeat count
 Hidden_Size = 100  # Hidden layer count
 Max_Memory = 5000  # Maximum number of game contents remembered
 batch_Size = 50  # Number of data bundles in training
@@ -42,64 +42,23 @@ Replay_Meomry = 100000
 
 reword = 0
 
-SEED = 2020
+RANDOM_STATE = 2020
+
+tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
-
-
-def reduce_mem_usage(df):
-    start_mem = df.memory_usage().sum() / 1024**2
-    print("Memory usage of dataframe is {:.2f} MB".format(start_mem))
-
-    for col in df.columns:
-        col_type = df[col].dtype
-    if col_type != object:
-        c_min = df[col].min()
-        c_max = df[col].max()
-        if str(col_type)[:3] == "int":
-            if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
-                df[col] = df[col].astype(np.int8)
-            elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(
-                    np.uint8).max:
-                df[col] = df[col].astype(np.uint8)
-            elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(
-                    np.int16).max:
-                df[col] = df[col].astype(np.int16)
-            elif c_min > np.iinfo(np.uint16).min and c_max < np.iinfo(
-                    np.uint16).max:
-                df[col] = df[col].astype(np.uint16)
-            elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(
-                    np.int32).max:
-                df[col] = df[col].astype(np.int32)
-            elif c_min > np.iinfo(np.uint32).min and c_max < np.iinfo(
-                    np.uint32).max:
-                df[col] = df[col].astype(np.uint32)
-            elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(
-                    np.int64).max:
-                df[col] = df[col].astype(np.int64)
-            elif c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(
-                    np.uint64).max:
-                df[col] = df[col].astype(np.uint64)
-        elif str(col_type)[:5] == "float":
-            if c_min > np.finfo(np.float16).min and c_max < np.finfo(
-                    np.float16).max:
-                df[col] = df[col].astype(np.float16)
-            elif c_min > np.finfo(np.float32).min and c_max < np.finfo(
-                    np.float32).max:
-                df[col] = df[col].astype(np.float32)
-            else:
-                df[col] = df[col].astype(np.float64)
-
-    end_mem = df.memory_usage().sum() / 1024**2
-    print("Memory usage after optimization is: {:.2f} MB".format(end_mem))
-    print("Decreased by {:.1f}%".format(100 * (start_mem - end_mem) /
-                                        start_mem))
-    return df
 
 
 def Jump():
     """
     Jump Function
+    """
+    pag.press("up")
+
+
+def Retry():
+    """
+    Retry Funtion
     """
     pag.press("space")
 
@@ -166,67 +125,29 @@ Game_Src_Click_pos = [379, 283]
 
 def RealTime():
     BringWindow()
-    i = 0
+    isGamePlay = load_model("Model\\20201218-003432model.h5")
+    isStart = 0
+
     while True:
-        i += 1
         with mss.mss() as sct:
             Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
-
-            # Below is a test to see if you are capturing the screen of the emulator.
+            """Below is a test to see if you are capturing the screen of the emulator."""
             # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(0)
+            # cv2.waitKey(1)
 
-            Game_Scr = cv2.resize(Game_Scr,
-                                  dsize=(960, 540),
-                                  interpolation=cv2.INTER_AREA)
-            # Game_Scr = np.ravel(Game_Scr)
+            Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
 
-            GMD_Model = os.path.join(os.getcwd(), "Model", "CNN",
-                                     "saved_model.pb")
-            GMD_Model_Keras = os.path.join(os.getcwd(), "..", "Model", "Keras",
-                                           "keras_model.h5")
+            if (tf.math.argmax(isGamePlay.predict(Game_Scr),
+                               axis=1) == 1) == True:
+                isStart += 1
+                print("Play...")
+                return 1
 
-            # model = saver.restore(sess, GMD_Model)
-            data = np.ndarray(shape=(1, 960, 540, 3), dtype=np.float32)
-
-            # Replace this with the path to your image
-            image = Image.open(Game_Scr)
-
-            # Make sure to resize all images to 224, 224 otherwise they won't fit in the array
-            image = image.resize((960, 540))
-            image_array = np.asarray(image)
-
-            # Normalize the image
-            normalized_image_array = image_array / 255.0
-
-            # Load the image into the array
-            data[0] = normalized_image_array
-
-            # run the inference
-            prediction = model.predict(data)
-            print(prediction)
-
-            with tf.Session() as sess:
-                graph = tf.Graph()
-                with graph.as_default():
-                    with tf.name_scope("Convolution"):
-                        Gmd = Convolution(Game_Scr)
-                    with tf.name_scope("Relu_Function"):
-                        Gmd = tf.nn.relu(Gmd)
-                    with tf.name_scope("MaxPool"):
-                        Gmd = Max_Pool(Gmd)
-                    if i == 1:
-                        writer = tf.summary.FileWriter(
-                            "..\Graph\GMDmiss", graph=tf.get_default_graph())
-                        writer.close()
-            print(Gmd.shape)
-            print(Gmd)
-            # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(0)
-
-            # CNN
-            # model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(28, 28, 1), activation='relu'))
-            # model.add(Conv2D(64, (3, 3), activation='relu'))
+            elif isStart > 1:
+                print("What are you doing?")
+                return 0
+            else:
+                print("Go!")
 
 
 def VideoAnalyze(Video):
@@ -253,7 +174,7 @@ def GamePlayWithLearning():
         #     Num_Of_Play_Time += 1
         #     Play_Time = time.time() - Play_Time # Playtime for one game
 
-        if epoch > Play_Time:
+        if EPOCH > play_time:
             break
 
 
@@ -289,7 +210,7 @@ def GamePlay():
                 print("Miss")
 
 
-def BinaryImageClassf():
+def ImageClassf():
     model = Sequential()
     model.add(
         Conv2D(120,
@@ -299,29 +220,31 @@ def BinaryImageClassf():
                activation="relu",
                input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25)))
-    model.add(Dropout(0.25))
+    model.add(Dropout(0.5))
 
     model.add(Conv2D(60, 30, 3, padding="same"))
     model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
-    model.add(Dropout(0.25))
+    model.add(Dropout(0.5))
 
     model.add(Conv2D(60, 25, 3, padding="same"))
     model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
-    model.add(Dropout(0.25))
+    model.add(Dropout(0.5))
 
     model.add(Flatten())
     model.add(Dense(256, activation="relu"))
     model.add(Dropout(0.5))
-    model.add(Dense(128, activation="sigmoid"))
 
-    model.add(Dense(1, activation="softmax"))
-    model.compile(loss="binary_crossentropy",
-                  optimizer="sgd",
+    model.add(Dense(2, activation="softmax"))
+    model.compile(loss="categorical_crossentropy",
+                  optimizer="Nadam",
                   metrics=["accuracy"])
     return model
 
 
 if __name__ == "__main__":
+    physical_devices = tf.config.list_physical_devices("GPU")
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
     First_State = int(
         input("""If you want to analyze your video?
 press 1.
@@ -352,8 +275,8 @@ Press 4
             validation_split=0.2,
             subset="training",
             shuffle=True,
-            seed=SEED,
-            label_mode="binary",
+            seed=RANDOM_STATE,
+            label_mode="categorical",
             image_size=(640, 360),
         )
         validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
@@ -361,8 +284,8 @@ Press 4
             validation_split=0.2,
             subset="validation",
             shuffle=True,
-            seed=SEED,
-            label_mode="binary",
+            seed=RANDOM_STATE,
+            label_mode="categorical",
             image_size=(640, 360),
         )
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
@@ -372,20 +295,29 @@ Press 4
         print(train_dataset)
 
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
-        # cv2.waitKey(0)
+        # cv2.waitKey(1)
 
         log_dir = "logs/fit/" + datetime.datetime.now().strftime(
             "%Y%m%d-%H%M%S")
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
                                                               histogram_freq=1)
 
-        bin_img_clssf = BinaryImageClassf()
+        try:
+            bin_img_clssf = load_model("Model\\20201218-003432model.h5")
+            # bin_img_clssf = ImageClassf()
+            print("Model load 성공")
+        except:
+            bin_img_clssf = ImageClassf()
+            print("Model load 실패")
+
         history = bin_img_clssf.fit(
             train_dataset,
             validation_data=validation_dataset,
-            epochs=30,
-            batch_size=2,
+            epochs=2,
+            batch_size=64,
             callbacks=[tensorboard_callback],
         )
 
-        model.save("model.h5")
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
