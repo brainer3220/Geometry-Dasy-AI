@@ -97,7 +97,7 @@ def Q_Value(State, Action):
     # return
 
 
-def Click_Start():
+def ClickStart():
     """
     Click to Start Button
     """
