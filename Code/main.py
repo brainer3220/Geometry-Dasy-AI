@@ -149,6 +149,7 @@ def RealTime():
             else:
                 print("Go!")
 
+
 def VideoAnalyze(Video):
     Vidcap = cv2.VideoCapture(Video)
     success, image = Vidcap.read()
@@ -211,25 +212,32 @@ def GamePlay():
 
 def ImageClassf():
     model = Sequential()
-    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                        input_shape=(640, 360, 3)))
+    model.add(
+        Conv2D(120,
+               60,
+               3,
+               padding="same",
+               activation="relu",
+               input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25)))
     model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 30, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 25, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Flatten())
-    model.add(Dense(256, activation = 'relu'))
+
+    model.add(Conv2D(60, 30, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
+    model.add(Conv2D(60, 25, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
+    model.add(Dropout(0.5))
+
+    model.add(Flatten())
+    model.add(Dense(256, activation="relu"))
+    model.add(Dropout(0.5))
+
+    model.add(Dense(2, activation="softmax"))
+    model.compile(loss="categorical_crossentropy",
+                  optimizer="Nadam",
+                  metrics=["accuracy"])
     return model
 
 
@@ -262,8 +270,24 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="training",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="validation",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
@@ -273,22 +297,27 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime(
+            "%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                              histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model('Model\\20201218-003432model.h5')
+            bin_img_clssf = load_model("Model\\20201218-003432model.h5")
             # bin_img_clssf = ImageClassf()
-            print('Model load 성공')
+            print("Model load 성공")
         except:
             bin_img_clssf = ImageClassf()
-            print('Model load 실패')
+            print("Model load 실패")
 
         history = bin_img_clssf.fit(
-            train_dataset, 
-            validation_data=validation_dataset, 
-            epochs=2, 
+            train_dataset,
+            validation_data=validation_dataset,
+            epochs=2,
             batch_size=64,
-            callbacks=[tensorboard_callback])
+            callbacks=[tensorboard_callback],
+        )
 
-        bin_img_clssf.save('Model\\' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + 'model.h5')
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
