@@ -1,22 +1,26 @@
+import datetime
 import glob
 import os
 import time
-import datetime
 
 import cv2
 import mss
-import pyautogui as pag
 import numpy as np
 import pandas as pd
-
+import pyautogui as pag
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
-from tensorflow.keras.models import Sequential, Model
-
-from PIL import Image, ImageOps
+from PIL import Image
 from PIL import ImageGrab
+from PIL import ImageOps
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.models import load_model
+from tensorflow.keras.models import Model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import img_to_array
 
 np.set_printoptions(suppress=True)
 
@@ -42,8 +46,8 @@ RANDOM_STATE = 2020
 
 tf.random.set_seed(RANDOM_STATE)
 
-
 # Funciton
+
 
 def Jump():
     """
@@ -56,7 +60,7 @@ def Retry():
     """
     Retry Funtion
     """
-    pag.press('space')
+    pag.press("space")
 
 
 def Q_Value(State, Action):
@@ -107,9 +111,10 @@ def GetResolution():
     """
     while True:
         x, y = pag.position()
-        position_str = 'X: ' + str(x) + 'Y: ' + str(y)
+        position_str = "X: " + str(x) + "Y: " + str(y)
         BringWindow()
         print(position_str)
+
 
 # Full resolution of the emulator
 Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
@@ -120,26 +125,26 @@ Game_Src_Click_pos = [379, 283]
 
 def RealTime():
     BringWindow()
-    isGamePlay = load_model('Model\\20201218-003432model.h5')
+    isGamePlay = load_model("Model\\20201218-003432model.h5")
     isStart = 0
 
     while True:
         with mss.mss() as sct:
             Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
-
             """Below is a test to see if you are capturing the screen of the emulator."""
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(1)
 
             Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
 
-            if (tf.math.argmax(isGamePlay.predict(Game_Scr), axis=1) == 1) == True:
+            if (tf.math.argmax(isGamePlay.predict(Game_Scr),
+                               axis=1) == 1) == True:
                 isStart += 1
-                print('Play...')
+                print("Play...")
                 return 1
 
             elif isStart > 1:
-                print('What are you doing?')
+                print("What are you doing?")
                 return 0
             else:
                 print("Go!")
@@ -207,34 +212,41 @@ def GamePlay():
 
 def ImageClassf():
     model = Sequential()
-    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                        input_shape=(640, 360, 3)))
+    model.add(
+        Conv2D(120,
+               60,
+               3,
+               padding="same",
+               activation="relu",
+               input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25)))
     model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 30, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 25, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Flatten())
-    model.add(Dense(256, activation = 'relu'))
+
+    model.add(Conv2D(60, 30, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
+    model.add(Conv2D(60, 25, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
+    model.add(Dropout(0.5))
+
+    model.add(Flatten())
+    model.add(Dense(256, activation="relu"))
+    model.add(Dropout(0.5))
+
+    model.add(Dense(2, activation="softmax"))
+    model.compile(loss="categorical_crossentropy",
+                  optimizer="Nadam",
+                  metrics=["accuracy"])
     return model
 
 
 if __name__ == "__main__":
-    physical_devices = tf.config.list_physical_devices('GPU') 
+    physical_devices = tf.config.list_physical_devices("GPU")
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
     First_State = int(
-    input("""If you want to analyze your video?
+        input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -246,7 +258,7 @@ Press 3.
 If you gaming from real time
 Press 4
 """))
-    
+
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
         VideoAnalyze(Video)
@@ -258,8 +270,24 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="training",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="validation",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
@@ -269,23 +297,27 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime(
+            "%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                              histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model('Model\\20201218-003432model.h5')
+            bin_img_clssf = load_model("Model\\20201218-003432model.h5")
             # bin_img_clssf = ImageClassf()
-            print('Model load 성공')
+            print("Model load 성공")
         except:
             bin_img_clssf = ImageClassf()
-            print('Model load 실패')
+            print("Model load 실패")
 
         history = bin_img_clssf.fit(
-            train_dataset, 
-            validation_data=validation_dataset, 
-            epochs=2, 
+            train_dataset,
+            validation_data=validation_dataset,
+            epochs=2,
             batch_size=64,
-            callbacks=[tensorboard_callback])
+            callbacks=[tensorboard_callback],
+        )
 
-        bin_img_clssf.save('Model\\' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + 'model.h5')
-
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
