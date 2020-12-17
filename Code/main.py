@@ -267,17 +267,25 @@ Press 4
         print(train_dataset)
 
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
-        # cv2.waitKey(0)
+        # cv2.waitKey(1)
 
         log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-        bin_img_clssf = BinaryImageClassf()
-        history = bin_img_clssf.fit(train_dataset,
-        validation_data=validation_dataset,
-        epochs=30,
-        batch_size=2,
-        callbacks=[tensorboard_callback])
+        try:
+            bin_img_clssf = load_model('Model\\20201218-003432model.h5')
+            # bin_img_clssf = ImageClassf()
+            print('Model load 성공')
+        except:
+            bin_img_clssf = ImageClassf()
+            print('Model load 실패')
 
-        model.save('model.h5')
+        history = bin_img_clssf.fit(
+            train_dataset, 
+            validation_data=validation_dataset, 
+            epochs=2, 
+            batch_size=64,
+            callbacks=[tensorboard_callback])
+
+        bin_img_clssf.save('Model\\' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + 'model.h5')
 
