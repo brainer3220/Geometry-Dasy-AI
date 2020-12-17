@@ -229,7 +229,7 @@ def Video_Analyze(Video):
 def Game_Play_With_Learning():
     Num_Of_Play_Time = int(input("Press number from Game Time."))
     while True:
-        Real_Time()
+        RealTime()
         Play_Time = time.time()  # Game start time
         Jump()
 
@@ -318,7 +318,7 @@ Press 4
         Video_Analyze(Video)
 
     elif First_State == 2:
-        Real_Time()
+        RealTime()
 
     elif First_State == 4:
         GamePlay()
