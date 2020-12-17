@@ -137,7 +137,8 @@ def RealTime():
 
             Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
 
-            if (tf.math.argmax(isGamePlay.predict(Game_Scr), axis=1) == 1) == True:
+            if (tf.math.argmax(isGamePlay.predict(Game_Scr),
+                               axis=1) == 1) == True:
                 isStart += 1
                 print("Play...")
                 return 1
@@ -193,9 +194,9 @@ def GamePlay():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(
-                Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA
-            )
+            Game_Scr = cv2.resize(Game_Scr,
+                                  dsize=(960, 540),
+                                  interpolation=cv2.INTER_AREA)
             x = np.array(Game_Scr).reshape(-1, 1)
 
             size = (224, 224)
@@ -212,8 +213,12 @@ def GamePlay():
 def ImageClassf():
     model = Sequential()
     model.add(
-        Conv2D(120, 60, 3, padding="same", activation="relu", input_shape=(640, 360, 3))
-    )
+        Conv2D(120,
+               60,
+               3,
+               padding="same",
+               activation="relu",
+               input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25)))
     model.add(Dropout(0.5))
 
@@ -230,9 +235,9 @@ def ImageClassf():
     model.add(Dropout(0.5))
 
     model.add(Dense(2, activation="softmax"))
-    model.compile(
-        loss="categorical_crossentropy", optimizer="Nadam", metrics=["accuracy"]
-    )
+    model.compile(loss="categorical_crossentropy",
+                  optimizer="Nadam",
+                  metrics=["accuracy"])
     return model
 
 
@@ -241,8 +246,7 @@ if __name__ == "__main__":
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
     First_State = int(
-        input(
-            """If you want to analyze your video?
+        input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -253,9 +257,7 @@ Press 3.
 
 If you gaming from real time
 Press 4
-"""
-        )
-    )
+"""))
 
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
@@ -295,10 +297,10 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(
-            log_dir=log_dir, histogram_freq=1
-        )
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime(
+            "%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                              histogram_freq=1)
 
         try:
             bin_img_clssf = load_model("Model\\20201218-003432model.h5")
@@ -316,6 +318,6 @@ Press 4
             callbacks=[tensorboard_callback],
         )
 
-        bin_img_clssf.save(
-            "Model\\" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "model.h5"
-        )
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
