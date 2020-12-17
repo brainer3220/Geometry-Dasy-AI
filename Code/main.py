@@ -214,7 +214,7 @@ def Real_Time():
 
 
 
-def Vidio_Analyze(Video):
+def Video_Analyze(Video):
     Vidcap = cv2.VideoCapture(Video)
     success, image = Vidcap.read()
     count = 0
@@ -315,7 +315,7 @@ Press 4
     
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
-        Vidio_Analyze(Video)
+        Video_Analyze(Video)
 
     elif First_State == 2:
         Real_Time()
