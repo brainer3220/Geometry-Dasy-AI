@@ -23,7 +23,7 @@ np.set_printoptions(suppress=True)
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
 nbActions = 2  # Number of actions (jump, wait)
-Epoch = 1001  # Game repeat count
+EPOCH = 1001  # Game repeat count
 Hidden_Size = 100  # Hidden layer count
 Max_Memory = 5000  # Maximum number of game contents remembered
 batch_Size = 50  # Number of data bundles in training
@@ -169,7 +169,7 @@ def GamePlayWithLearning():
         #     Num_Of_Play_Time += 1
         #     Play_Time = time.time() - Play_Time # Playtime for one game
 
-        if epoch > Play_Time:
+        if EPOCH > play_time:
             break
 
 
