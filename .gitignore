@@ -9,6 +9,5 @@
 .history/
 
 
-
-.logs
-.Model
+logs/
+Model/
