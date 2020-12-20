@@ -242,7 +242,7 @@ Press 4
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model('Model\\20201218-003432model.h5')
+            bin_img_clssf = load_model('Model\\' + str(os.listdir('Model')[-1]))
             # bin_img_clssf = ImageClassf()
             print('Model load 성공')
         except:
