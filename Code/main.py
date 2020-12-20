@@ -67,15 +67,6 @@ def Q_Value(State, Action):
     # return
 
 
-def ClickStart():
-    """
-    Click to Start Button
-    """
-    pag.moveTo(417, 257)  # X and y coordinates of the start button
-    pag.mouseDown()
-    pag.mouseUp()
-
-
 def BringWindow():
     """
     Bring the emulator to the front
@@ -116,33 +107,6 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
-
-
-def RealTime():
-    BringWindow()
-    isGamePlay = load_model('Model\\20201218-003432model.h5')
-    isStart = 0
-
-    while True:
-        with mss.mss() as sct:
-            Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
-
-            """Below is a test to see if you are capturing the screen of the emulator."""
-            # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(1)
-
-            Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
-
-            if (tf.math.argmax(isGamePlay.predict(Game_Scr), axis=1) == 1) == True:
-                isStart += 1
-                print('Play...')
-                return 1
-
-            elif isStart > 1:
-                print('What are you doing?')
-                return 0
-            else:
-                print("Go!")
 
 
 def VideoAnalyze(Video):
