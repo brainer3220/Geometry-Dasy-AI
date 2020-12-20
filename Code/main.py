@@ -53,14 +53,19 @@ def Jump():
     """
     Jump Function
     """
-    pag.press("up")
+    pag.moveTo(416, 275)
+    pag.mouseDown()
+    time.sleep(0.05)
+    pag.mouseUp()
 
 
 def Retry():
     """
     Retry Funtion
     """
-    pag.press("space")
+    pag.moveTo(240, 480)
+    pag.mouseDown()
+    pag.mouseUp()
 
 
 def Q_Value(State, Action):
@@ -69,15 +74,6 @@ def Q_Value(State, Action):
     """
     reword + (Discount * max(Q_next))
     # return
-
-
-def ClickStart():
-    """
-    Click to Start Button
-    """
-    pag.moveTo(417, 257)  # X and y coordinates of the start button
-    pag.mouseDown()
-    pag.mouseUp()
 
 
 def BringWindow():
@@ -121,33 +117,6 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
-
-
-def RealTime():
-    BringWindow()
-    isGamePlay = load_model("Model\\20201218-003432model.h5")
-    isStart = 0
-
-    while True:
-        with mss.mss() as sct:
-            Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
-            """Below is a test to see if you are capturing the screen of the emulator."""
-            # cv2.imshow('Game_Src', Game_Scr)
-            # cv2.waitKey(1)
-
-            Game_Scr = np.resize(Game_Scr, (1, 960, 540, 3))
-
-            if (tf.math.argmax(isGamePlay.predict(Game_Scr),
-                               axis=1) == 1) == True:
-                isStart += 1
-                print("Play...")
-                return 1
-
-            elif isStart > 1:
-                print("What are you doing?")
-                return 0
-            else:
-                print("Go!")
 
 
 def VideoAnalyze(Video):
@@ -303,7 +272,8 @@ Press 4
                                                               histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model("Model\\20201218-003432model.h5")
+            bin_img_clssf = load_model("Model\\" +
+                                       str(os.listdir("Model")[-1]))
             # bin_img_clssf = ImageClassf()
             print("Model load 성공")
         except:

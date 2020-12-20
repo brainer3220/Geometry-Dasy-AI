@@ -4,7 +4,11 @@
 
 ## What?
 
-본 Prozect는 Geomatry Dash의 AI를 만드는 것입니다.
+This is 'is Geometrydash play?' AI
+
+https://www.youtube.com/embed/VBzeyq4Vkek
+
+This Project is make AI for Geomatry Dash and other.
 
 ### 📋Dependency
 
