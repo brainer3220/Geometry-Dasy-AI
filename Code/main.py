@@ -49,7 +49,10 @@ def Jump():
     """
     Jump Function
     """
-    pag.press("up")
+    pag.moveTo(416, 275)
+    pag.mouseDown()
+    time.sleep(0.05)
+    pag.mouseUp()
 
 
 def Retry():
