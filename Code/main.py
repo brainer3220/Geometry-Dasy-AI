@@ -166,7 +166,7 @@ def ImageClassf():
     model = Sequential()
     model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
                         input_shape=(640, 360, 3)))
-    model.add(MaxPooling2D(pool_size=(65, 25)))
+    model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
     model.add(Dropout(0.5))
     
     model.add(Conv2D(60, 30, 3, padding='same'))
