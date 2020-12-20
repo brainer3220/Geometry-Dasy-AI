@@ -6,7 +6,6 @@ This is 'is Geometrydash play?' AI
 
 https://www.youtube.com/embed/VBzeyq4Vkek
 
-
 This Project is make AI for Geomatry Dash and other.
 
 ### 📋Dependency
