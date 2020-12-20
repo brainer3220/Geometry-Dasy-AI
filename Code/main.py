@@ -59,7 +59,9 @@ def Retry():
     """
     Retry Funtion
     """
-    pag.press('space')
+    pag.moveTo(240, 480)
+    pag.mouseDown()
+    pag.mouseUp()
 
 
 def Q_Value(State, Action):
