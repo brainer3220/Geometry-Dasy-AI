@@ -9,17 +9,10 @@ import numpy as np
 import pandas as pd
 import pyautogui as pag
 import tensorflow as tf
-from PIL import Image
-from PIL import ImageGrab
-from PIL import ImageOps
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import MaxPooling2D
-from tensorflow.keras.models import load_model
-from tensorflow.keras.models import Model
-from tensorflow.keras.models import Sequential
+from PIL import Image, ImageGrab, ImageOps
+from tensorflow.keras.layers import (Conv2D, Dense, Dropout, Flatten,
+                                     MaxPooling2D)
+from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 
 np.set_printoptions(suppress=True)
