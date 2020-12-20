@@ -223,7 +223,7 @@ Press 4
         VideoAnalyze(Video)
 
     elif First_State == 2:
-        RealTime()
+        GamePlayWithLearning()
 
     elif First_State == 4:
         GamePlay()
