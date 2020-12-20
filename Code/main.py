@@ -66,7 +66,7 @@ def Retry():
     pag.moveTo(240, 480)
     pag.mouseDown()
     pag.mouseUp()
-    
+
 
 def Q_Value(State, Action):
     """
@@ -272,7 +272,8 @@ Press 4
                                                               histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model('Model\\' + str(os.listdir('Model')[-1]))
+            bin_img_clssf = load_model(
+                'Model\\' + str(os.listdir('Model')[-1]))
             # bin_img_clssf = ImageClassf()
             print("Model load 성공")
         except:
