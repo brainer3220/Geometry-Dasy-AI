@@ -129,22 +129,8 @@ def VideoAnalyze(Video):
 
 
 def GamePlayWithLearning():
-    Num_Of_Play_Time = int(input("Press number from Game Time."))
-    while True:
-        RealTime()
-        Play_Time = time.time()  # Game start time
-        Jump()
-
-        # if:        # if ended from One of game, up to Play Time.
-        #
-        #     Num_Of_Play_Time += 1
-        #     Play_Time = time.time() - Play_Time # Playtime for one game
-
-        if EPOCH > play_time:
-            break
 
 
-# def Play_Learning:
 
 
 def GamePlay():
