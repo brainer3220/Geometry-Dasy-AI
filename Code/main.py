@@ -2,6 +2,9 @@ import datetime
 import glob
 import os
 import time
+import datetime
+import random
+import shutil
 
 import cv2
 import mss
@@ -132,22 +135,8 @@ def VideoAnalyze(Video):
 
 
 def GamePlayWithLearning():
-    Num_Of_Play_Time = int(input("Press number from Game Time."))
-    while True:
-        RealTime()
-        Play_Time = time.time()  # Game start time
-        Jump()
-
-        # if:        # if ended from One of game, up to Play Time.
-        #
-        #     Num_Of_Play_Time += 1
-        #     Play_Time = time.time() - Play_Time # Playtime for one game
-
-        if EPOCH > play_time:
-            break
 
 
-# def Play_Learning:
 
 
 def GamePlay():
@@ -181,32 +170,25 @@ def GamePlay():
 
 def ImageClassf():
     model = Sequential()
-    model.add(
-        Conv2D(120,
-               60,
-               3,
-               padding="same",
-               activation="relu",
-               input_shape=(640, 360, 3)))
-    model.add(MaxPooling2D(pool_size=(65, 25)))
+    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
+                        input_shape=(640, 360, 3)))
+    model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
     model.add(Dropout(0.5))
-
-    model.add(Conv2D(60, 30, 3, padding="same"))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
+    
+    model.add(Conv2D(60, 30, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.5))
-
-    model.add(Conv2D(60, 25, 3, padding="same"))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
+    
+    model.add(Conv2D(60, 25, 3, padding='same'))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.5))
-
+    
     model.add(Flatten())
-    model.add(Dense(256, activation="relu"))
+    model.add(Dense(256, activation = 'relu'))
     model.add(Dropout(0.5))
 
-    model.add(Dense(2, activation="softmax"))
-    model.compile(loss="categorical_crossentropy",
-                  optimizer="Nadam",
-                  metrics=["accuracy"])
+    model.add(Dense(2, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
     return model
 
 
@@ -233,7 +215,7 @@ Press 4
         VideoAnalyze(Video)
 
     elif First_State == 2:
-        RealTime()
+        GamePlayWithLearning()
 
     elif First_State == 4:
         GamePlay()
