@@ -1,3 +1,4 @@
+import datetime
 import glob
 import os
 import time
@@ -7,18 +8,22 @@ import shutil
 
 import cv2
 import mss
-import pyautogui as pag
 import numpy as np
 import pandas as pd
-
+import pyautogui as pag
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
-from tensorflow.keras.models import Sequential, Model
-
-from PIL import Image, ImageOps
+from PIL import Image
 from PIL import ImageGrab
+from PIL import ImageOps
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.models import load_model
+from tensorflow.keras.models import Model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import img_to_array
 
 np.set_printoptions(suppress=True)
 
@@ -44,8 +49,8 @@ RANDOM_STATE = 2020
 
 tf.random.set_seed(RANDOM_STATE)
 
-
 # Funciton
+
 
 def Jump():
     """
@@ -105,9 +110,10 @@ def GetResolution():
     """
     while True:
         x, y = pag.position()
-        position_str = 'X: ' + str(x) + 'Y: ' + str(y)
+        position_str = "X: " + str(x) + "Y: " + str(y)
         BringWindow()
         print(position_str)
+
 
 # Full resolution of the emulator
 Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
@@ -187,11 +193,11 @@ def ImageClassf():
 
 
 if __name__ == "__main__":
-    physical_devices = tf.config.list_physical_devices('GPU') 
+    physical_devices = tf.config.list_physical_devices("GPU")
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
     First_State = int(
-    input("""If you want to analyze your video?
+        input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -203,7 +209,7 @@ Press 3.
 If you gaming from real time
 Press 4
 """))
-    
+
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
         VideoAnalyze(Video)
@@ -215,8 +221,24 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="training", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory("Photo\\isPlay", validation_split=0.2, subset="validation", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+        train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="training",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
+        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="validation",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
@@ -226,23 +248,28 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime(
+            "%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                              histogram_freq=1)
 
         try:
-            bin_img_clssf = load_model('Model\\' + str(os.listdir('Model')[-1]))
+            bin_img_clssf = load_model("Model\\" +
+                                       str(os.listdir("Model")[-1]))
             # bin_img_clssf = ImageClassf()
-            print('Model load 성공')
+            print("Model load 성공")
         except:
             bin_img_clssf = ImageClassf()
-            print('Model load 실패')
+            print("Model load 실패")
 
         history = bin_img_clssf.fit(
-            train_dataset, 
-            validation_data=validation_dataset, 
-            epochs=2, 
+            train_dataset,
+            validation_data=validation_dataset,
+            epochs=2,
             batch_size=64,
-            callbacks=[tensorboard_callback])
+            callbacks=[tensorboard_callback],
+        )
 
-        bin_img_clssf.save('Model\\' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + 'model.h5')
-
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
