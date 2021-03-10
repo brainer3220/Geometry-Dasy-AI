@@ -23,14 +23,19 @@ This Project is make AI for Geomatry Dash and other.
 
 ### GeometryDash_AI Directory
 
-    ├─Code
-    ├─Photo
-        ├─Agent
-        ├─Coin
-        ├─Lock_Icon
-        ├─Loof
-        ├─Obstacles
-        ├─Play_Button
+    ├── Code
+    ├── Graph
+    │   └── GMDmiss
+    └── Photo
+        ├── Agent
+        ├── Coin
+        ├── Lock_Icon
+        ├── Loof
+        ├── Obstacles
+        ├── Play_Button
+        └── isPlay
+            ├── GMD\ Miss
+            └── GMD\ Play
 
 # 👏How to Contribute
 
