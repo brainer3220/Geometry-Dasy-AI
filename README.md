@@ -1,5 +1,3 @@
-# WE CHANGE CONVERT 2 TENSORFLOW2
-
 # Introduce
 
 ## What?
