@@ -135,14 +135,135 @@ def VideoAnalyze(Video):
 
 
 def GamePlayWithLearning():
+    BringWindow()
+    isGamePlay = load_model('Model\\' + str(os.listdir('Model')[-1])) # load_model('Model\\20201218-003432model.h5')
+    print('Model\\' + str(os.listdir('Model')[-1]))
+    # last_select = []
+    isStart = 0
+
+    for a_epoch in range(EPOCH):
+        with mss.mss() as sct:
+            Game_Scr = np.array(sct.grab(Game_Scr_pos))[:, :, :3]
+
+            """Below is a test to see if you are capturing the screen of the emulator."""
+            # cv2.imshow('Game_Src', Game_Scr)
+            # cv2.waitKey(1)
+
+            Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
+
+            play_now = (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1) == True
+            
+            if play_now == True:
+                rnd = random.randint(1, 10)
+                if isStart < 1:
+                    if not os.path.exists('tmp'):
+                        # os.makedirs('tmp')
+                        os.makedirs('tmp\\stay')
+                        os.makedirs('tmp\\up')   
+                    try:
+                        dqn = load_model('Model\\Play\\game_play.h5')
+                        # dqn = ImageClassf
+                        is_load_model = True
+                        print('Model load 성공')
+                    except:
+                        # dqn = Q_net.QNet()
+                        is_load_model = False
+                        print('Model load 실패')
+                    play_time = time.time()
+                    print('Play...')
+
+                isStart += 1
+
+                if is_load_model == True:
+                    if rnd == 1 or rnd == 2:
+                        save_path = 'stay'
+                        print('RAND Stay')
+                        pass
+                    elif rnd == 3 or rnd == 4:
+                        save_path = 'up'
+                        Jump()
+                        print('RAND Up')
+                    else:
+                        tmp = tf.math.argmax(dqn.predict(Game_Scr_numpy), axis=1)
+
+                        if tmp == 1:
+                            save_path = 'stay'
+                            print('Stay')
+                            pass
+                        else:
+                            save_path = 'up'
+                            Jump()
+                            print('Up')
+                else:
+                    if rnd < 6:
+                        save_path = 'stay'
+                        print('stay')
+                    elif rnd >= 6:
+                        save_path = 'up'
+                        Jump()
+                        print('up')
+                    else:
+                        print("It's a problem")
+                cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
 
 
+            elif play_now == False and isStart < 1:
+                print("Go!")
+
+            elif play_now == False and isStart > 1:
+                play_time = time.time() - play_time
+                print('What are you doing?')
+
+                # try:
+                    # for - in range(2):
+                    #     print((os.listdir('tmp\\stay') + os.listdir('tmp\\up')).sort()[-1])
+                    #     os.remove('tmp\\up\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
+                    #     os.remove('tmp\\stay\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
+                        # os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
+                        # os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
+                    # for i in range(1):
+                    #     if save_path == 'stay':
+                    #         os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
+                    #     elif save_path == 'up':
+                    #         os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
+                # except:
+                #     pass
+                
+                # try:
+                game_play = tf.keras.preprocessing.image_dataset_from_directory("tmp", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+
+                # to Numpy
+                print("TF Data to Numpy")
+                for kkk in game_play.as_numpy_iterator():
+                    tmp = kkk
+                x, y = kkk
+                del tmp, kkk, game_play
+
+                # x = np.concatenate([x, ], axis=1)
+                print(x.shape, y.shape)
+                Q_net.QNet(x, tf.keras.activations.tanh(tf.nn.softmax([float(play_time), 85.])), y)
+
+                    # dqn.fit(x, callbacks=[tf.keras.callbacks.TensorBoard(log_dir="logs/fit/play/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), histogram_freq=1)])
+                    # dqn.predict(x)
+                    # dqn.save('Model\\Play\\game_play.h5')
+                # except:
+                #     pass
+
+                isStart = 0
+                # shutil.rmtree("tmp")
+                # time.sleep(0)
+                
+                Retry()
+                continue
+            else:
+                print('This may issue is an issue where AI is slow to detect the image on the screen.')
+            # time.sleep(0.42)
 
 
 def GamePlay():
     np.set_printoptions(suppress=True)
 
-    model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
+    # model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
 
     while True:
         with mss.mss() as sct:
