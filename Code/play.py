@@ -1,5 +1,6 @@
 import pyautogui as pag
 
+
 def Jump():
     """
     Jump Function
@@ -37,7 +38,7 @@ def BringWindow():
     activate
     end tell
     """
-    
+
 
 def GetResolution():
     """

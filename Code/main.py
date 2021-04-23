@@ -52,6 +52,7 @@ tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
 
+
 def average_hash(fname, size=16):
     img = Image.open(fname)
     img = img.convert("L")
@@ -62,7 +63,6 @@ def average_hash(fname, size=16):
     avg = pixels.mean()
     diff = 1 * (pixels > avg)
     print(diff)
-
 
 
 # Full resolution of the emulator
@@ -86,7 +86,8 @@ def VideoAnalyze(Video):
 
 def GamePlayWithLearning():
     BringWindow()
-    isGamePlay = load_model('Model\\' + str(os.listdir('Model')[-1])) # load_model('Model\\20201218-003432model.h5')
+    # load_model('Model\\20201218-003432model.h5')
+    isGamePlay = load_model('Model\\' + str(os.listdir('Model')[-1]))
     print('Model\\' + str(os.listdir('Model')[-1]))
     # last_select = []
     isStart = 0
@@ -101,15 +102,16 @@ def GamePlayWithLearning():
 
             Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
 
-            play_now = (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1) == True
-            
+            play_now = (tf.math.argmax(isGamePlay.predict(
+                Game_Scr_numpy), axis=1) == 1) == True
+
             if play_now == True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
                     if not os.path.exists('tmp'):
                         # os.makedirs('tmp')
                         os.makedirs('tmp\\stay')
-                        os.makedirs('tmp\\up')   
+                        os.makedirs('tmp\\up')
                     try:
                         dqn = load_model('Model\\Play\\game_play.h5')
                         # dqn = ImageClassf
@@ -134,7 +136,8 @@ def GamePlayWithLearning():
                         Jump()
                         print('RAND Up')
                     else:
-                        tmp = tf.math.argmax(dqn.predict(Game_Scr_numpy), axis=1)
+                        tmp = tf.math.argmax(
+                            dqn.predict(Game_Scr_numpy), axis=1)
 
                         if tmp == 1:
                             save_path = 'stay'
@@ -154,8 +157,8 @@ def GamePlayWithLearning():
                         print('up')
                     else:
                         print("It's a problem")
-                cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
-
+                cv2.imwrite(
+                    f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
 
             elif play_now == False and isStart < 1:
                 print("Go!")
@@ -165,22 +168,23 @@ def GamePlayWithLearning():
                 print('What are you doing?')
 
                 # try:
-                    # for - in range(2):
-                    #     print((os.listdir('tmp\\stay') + os.listdir('tmp\\up')).sort()[-1])
-                    #     os.remove('tmp\\up\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
-                    #     os.remove('tmp\\stay\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
-                        # os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
-                        # os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
-                    # for i in range(1):
-                    #     if save_path == 'stay':
-                    #         os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
-                    #     elif save_path == 'up':
-                    #         os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
+                # for - in range(2):
+                #     print((os.listdir('tmp\\stay') + os.listdir('tmp\\up')).sort()[-1])
+                #     os.remove('tmp\\up\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
+                #     os.remove('tmp\\stay\\' + os.listdir('tmp\\stay') + os.listdir('tmp\\up').sort(reverse=True)[-1])
+                # os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
+                # os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
+                # for i in range(1):
+                #     if save_path == 'stay':
+                #         os.remove('tmp\\stay\\' + os.listdir('tmp\\stay')[-1])
+                #     elif save_path == 'up':
+                #         os.remove('tmp\\up\\' + os.listdir('tmp\\up')[-1])
                 # except:
                 #     pass
-                
+
                 # try:
-                game_play = tf.keras.preprocessing.image_dataset_from_directory("tmp", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+                game_play = tf.keras.preprocessing.image_dataset_from_directory(
+                    "tmp", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
 
                 # to Numpy
                 print("TF Data to Numpy")
@@ -191,22 +195,24 @@ def GamePlayWithLearning():
 
                 # x = np.concatenate([x, ], axis=1)
                 print(x.shape, y.shape)
-                Q_net.QNet(x, tf.keras.activations.tanh(tf.nn.softmax([float(play_time), 85.])), y)
+                Q_net.QNet(x, tf.keras.activations.tanh(
+                    tf.nn.softmax([float(play_time), 85.])), y)
 
-                    # dqn.fit(x, callbacks=[tf.keras.callbacks.TensorBoard(log_dir="logs/fit/play/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), histogram_freq=1)])
-                    # dqn.predict(x)
-                    # dqn.save('Model\\Play\\game_play.h5')
+                # dqn.fit(x, callbacks=[tf.keras.callbacks.TensorBoard(log_dir="logs/fit/play/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), histogram_freq=1)])
+                # dqn.predict(x)
+                # dqn.save('Model\\Play\\game_play.h5')
                 # except:
                 #     pass
 
                 isStart = 0
                 # shutil.rmtree("tmp")
                 # time.sleep(0)
-                
+
                 Retry()
                 continue
             else:
-                print('This may issue is an issue where AI is slow to detect the image on the screen.')
+                print(
+                    'This may issue is an issue where AI is slow to detect the image on the screen.')
             # time.sleep(0.42)
 
 
@@ -242,24 +248,25 @@ def GamePlay():
 def ImageClassf():
     model = Sequential()
     model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                        input_shape=(640, 360, 3)))
+                     input_shape=(640, 360, 3)))
     model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
     model.add(Dropout(0.5))
-    
+
     model.add(Conv2D(60, 30, 3, padding='same'))
     model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.5))
-    
+
     model.add(Conv2D(60, 25, 3, padding='same'))
     model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
     model.add(Dropout(0.5))
-    
+
     model.add(Flatten())
-    model.add(Dense(256, activation = 'relu'))
+    model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
 
     model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='Nadam', metrics=['accuracy'])
     return model
 
 
