@@ -13,9 +13,7 @@ import pandas as pd
 
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
-from tensorflow.keras.models import Sequential, Model
+from ImageClassf import ImageClassf
 
 from PIL import Image, ImageOps
 from PIL import ImageGrab
@@ -283,30 +281,6 @@ def GamePlay():
                 print("Miss")
 
 
-def ImageClassf():
-    model = Sequential()
-    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                        input_shape=(640, 360, 3)))
-    model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 30, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Conv2D(60, 25, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
-    model.add(Dropout(0.5))
-    
-    model.add(Flatten())
-    model.add(Dense(256, activation = 'relu'))
-    model.add(Dropout(0.5))
-
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy', optimizer='Nadam', metrics=['accuracy'])
-    return model
-
-
 if __name__ == "__main__":
     physical_devices = tf.config.list_physical_devices('GPU') 
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
@@ -352,10 +326,10 @@ Press 4
 
         try:
             bin_img_clssf = load_model('Model\\' + str(os.listdir('Model')[-1]))
-            # bin_img_clssf = ImageClassf()
+            # bin_img_clssf = ImageClassf
             print('Model load 성공')
         except:
-            bin_img_clssf = ImageClassf()
+            bin_img_clssf = ImageClassf
             print('Model load 실패')
 
         history = bin_img_clssf.fit(
