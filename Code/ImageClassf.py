@@ -1,7 +1,8 @@
 import tensorflow as tf
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
+from tensorflow.keras.layers import (Conv2D, Dense, Dropout, Flatten,
+                                     MaxPooling2D)
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import img_to_array
 
 
 def ImageClassf():
