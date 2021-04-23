@@ -11,10 +11,15 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from ImageClassf import ImageClassf
-from PIL import Image, ImageGrab, ImageOps
+from PIL import Image
+from PIL import ImageGrab
+from PIL import ImageOps
 from play import *
-from tensorflow.keras.layers import (Conv2D, Dense, Dropout, Flatten,
-                                     MaxPooling2D)
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.models import load_model
 
 np.set_printoptions(suppress=True)
