@@ -87,8 +87,8 @@ def VideoAnalyze(Video):
 def GamePlayWithLearning():
     BringWindow()
     # load_model('Model\\20201218-003432model.h5')
-    isGamePlay = load_model('Model\\' + str(os.listdir('Model')[-1]))
-    print('Model\\' + str(os.listdir('Model')[-1]))
+    isGamePlay = load_model("Model\\" + str(os.listdir("Model")[-1]))
+    print("Model\\" + str(os.listdir("Model")[-1]))
     # last_select = []
     isStart = 0
 
@@ -102,70 +102,69 @@ def GamePlayWithLearning():
 
             Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
 
-            play_now = (tf.math.argmax(isGamePlay.predict(
-                Game_Scr_numpy), axis=1) == 1) == True
+            play_now = (
+                tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1
+            ) == True
 
             if play_now == True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
-                    if not os.path.exists('tmp'):
+                    if not os.path.exists("tmp"):
                         # os.makedirs('tmp')
-                        os.makedirs('tmp\\stay')
-                        os.makedirs('tmp\\up')
+                        os.makedirs("tmp\\stay")
+                        os.makedirs("tmp\\up")
                     try:
-                        dqn = load_model('Model\\Play\\game_play.h5')
+                        dqn = load_model("Model\\Play\\game_play.h5")
                         # dqn = ImageClassf
                         is_load_model = True
-                        print('Model load 성공')
+                        print("Model load 성공")
                     except:
                         # dqn = Q_net.QNet()
                         is_load_model = False
-                        print('Model load 실패')
+                        print("Model load 실패")
                     play_time = time.time()
-                    print('Play...')
+                    print("Play...")
 
                 isStart += 1
 
                 if is_load_model == True:
                     if rnd == 1 or rnd == 2:
-                        save_path = 'stay'
-                        print('RAND Stay')
+                        save_path = "stay"
+                        print("RAND Stay")
                         pass
                     elif rnd == 3 or rnd == 4:
-                        save_path = 'up'
+                        save_path = "up"
                         Jump()
-                        print('RAND Up')
+                        print("RAND Up")
                     else:
-                        tmp = tf.math.argmax(
-                            dqn.predict(Game_Scr_numpy), axis=1)
+                        tmp = tf.math.argmax(dqn.predict(Game_Scr_numpy), axis=1)
 
                         if tmp == 1:
-                            save_path = 'stay'
-                            print('Stay')
+                            save_path = "stay"
+                            print("Stay")
                             pass
                         else:
-                            save_path = 'up'
+                            save_path = "up"
                             Jump()
-                            print('Up')
+                            print("Up")
                 else:
                     if rnd < 6:
-                        save_path = 'stay'
-                        print('stay')
+                        save_path = "stay"
+                        print("stay")
                     elif rnd >= 6:
-                        save_path = 'up'
+                        save_path = "up"
                         Jump()
-                        print('up')
+                        print("up")
                     else:
                         print("It's a problem")
-                cv2.imwrite(
-                    f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
+                cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
 
             elif play_now == False and isStart < 1:
                 print("Go!")
 
             elif play_now == False and isStart > 1:
                 play_time = time.time() - play_time
-                print('What are you doing?')
+                print("What are you doing?")
 
                 # try:
                 # for - in range(2):
@@ -184,7 +183,12 @@ def GamePlayWithLearning():
 
                 # try:
                 game_play = tf.keras.preprocessing.image_dataset_from_directory(
-                    "tmp", shuffle=True, seed=RANDOM_STATE, label_mode='categorical', image_size=(640, 360))
+                    "tmp",
+                    shuffle=True,
+                    seed=RANDOM_STATE,
+                    label_mode="categorical",
+                    image_size=(640, 360),
+                )
 
                 # to Numpy
                 print("TF Data to Numpy")
@@ -195,8 +199,11 @@ def GamePlayWithLearning():
 
                 # x = np.concatenate([x, ], axis=1)
                 print(x.shape, y.shape)
-                Q_net.QNet(x, tf.keras.activations.tanh(
-                    tf.nn.softmax([float(play_time), 85.])), y)
+                Q_net.QNet(
+                    x,
+                    tf.keras.activations.tanh(tf.nn.softmax([float(play_time), 85.0])),
+                    y,
+                )
 
                 # dqn.fit(x, callbacks=[tf.keras.callbacks.TensorBoard(log_dir="logs/fit/play/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"), histogram_freq=1)])
                 # dqn.predict(x)
@@ -212,7 +219,8 @@ def GamePlayWithLearning():
                 continue
             else:
                 print(
-                    'This may issue is an issue where AI is slow to detect the image on the screen.')
+                    "This may issue is an issue where AI is slow to detect the image on the screen."
+                )
             # time.sleep(0.42)
 
 
@@ -229,9 +237,9 @@ def GamePlay():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(Game_Scr,
-                                  dsize=(960, 540),
-                                  interpolation=cv2.INTER_AREA)
+            Game_Scr = cv2.resize(
+                Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA
+            )
             x = np.array(Game_Scr).reshape(-1, 1)
 
             size = (224, 224)
@@ -247,26 +255,28 @@ def GamePlay():
 
 def ImageClassf():
     model = Sequential()
-    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                     input_shape=(640, 360, 3)))
-    model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
+    model.add(
+        Conv2D(120, 60, 3, padding="same", activation="relu", input_shape=(640, 360, 3))
+    )
+    model.add(MaxPooling2D(pool_size=(65, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Conv2D(60, 30, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Conv2D(60, 30, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Conv2D(60, 25, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Conv2D(60, 25, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
     model.add(Flatten())
-    model.add(Dense(256, activation='relu'))
+    model.add(Dense(256, activation="relu"))
     model.add(Dropout(0.5))
 
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='Nadam', metrics=['accuracy'])
+    model.add(Dense(2, activation="softmax"))
+    model.compile(
+        loss="categorical_crossentropy", optimizer="Nadam", metrics=["accuracy"]
+    )
     return model
 
 
@@ -275,7 +285,8 @@ if __name__ == "__main__":
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
     First_State = int(
-        input("""If you want to analyze your video?
+        input(
+            """If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -286,7 +297,9 @@ Press 3.
 
 If you gaming from real time
 Press 4
-"""))
+"""
+        )
+    )
 
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
@@ -326,14 +339,13 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime(
-            "%Y%m%d-%H%M%S")
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
-                                                              histogram_freq=1)
+        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            log_dir=log_dir, histogram_freq=1
+        )
 
         try:
-            bin_img_clssf = load_model("Model\\" +
-                                       str(os.listdir("Model")[-1]))
+            bin_img_clssf = load_model("Model\\" + str(os.listdir("Model")[-1]))
             # bin_img_clssf = ImageClassf()
             print("Model load 성공")
         except:
@@ -348,6 +360,6 @@ Press 4
             callbacks=[tensorboard_callback],
         )
 
-        bin_img_clssf.save("Model\\" +
-                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
-                           "model.h5")
+        bin_img_clssf.save(
+            "Model\\" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "model.h5"
+        )
