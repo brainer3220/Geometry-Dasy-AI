@@ -10,6 +10,7 @@ import mss
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from ImageClassf import ImageClassf
 from PIL import Image
 from PIL import ImageGrab
 from PIL import ImageOps
@@ -20,11 +21,6 @@ from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import MaxPooling2D
 from tensorflow.keras.models import load_model
-
-from ImageClassf import ImageClassf
-
-from PIL import Image, ImageOps
-from PIL import ImageGrab
 
 np.set_printoptions(suppress=True)
 
@@ -253,7 +249,7 @@ def GamePlay():
             else:
                 print("Miss")
 
-                
+
 if __name__ == "__main__":
     physical_devices = tf.config.list_physical_devices("GPU")
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
