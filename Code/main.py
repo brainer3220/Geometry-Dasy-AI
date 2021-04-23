@@ -10,10 +10,10 @@ import cv2
 import mss
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from PIL import Image
 from PIL import ImageGrab
 from PIL import ImageOps
+import tensorflow as tf
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dropout
