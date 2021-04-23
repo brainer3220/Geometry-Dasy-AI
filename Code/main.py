@@ -10,7 +10,6 @@ import cv2
 import mss
 import numpy as np
 import pandas as pd
-import pyautogui as pag
 import tensorflow as tf
 from PIL import Image
 from PIL import ImageGrab
