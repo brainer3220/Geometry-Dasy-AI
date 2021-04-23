@@ -6,24 +6,26 @@ from tensorflow.keras.models import Sequential
 
 def ImageClassf():
     model = Sequential()
-    model.add(Conv2D(120, 60, 3, padding='same', activation='relu',
-                     input_shape=(640, 360, 3)))
-    model.add(MaxPooling2D(pool_size=(65, 25), padding='same'))
+    model.add(
+        Conv2D(120, 60, 3, padding="same", activation="relu", input_shape=(640, 360, 3))
+    )
+    model.add(MaxPooling2D(pool_size=(65, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Conv2D(60, 30, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Conv2D(60, 30, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
-    model.add(Conv2D(60, 25, 3, padding='same'))
-    model.add(MaxPooling2D(pool_size=(60, 25), padding='same'))
+    model.add(Conv2D(60, 25, 3, padding="same"))
+    model.add(MaxPooling2D(pool_size=(60, 25), padding="same"))
     model.add(Dropout(0.5))
 
     model.add(Flatten())
-    model.add(Dense(256, activation='relu'))
+    model.add(Dense(256, activation="relu"))
     model.add(Dropout(0.5))
 
-    model.add(Dense(2, activation='softmax'))
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='Nadam', metrics=['accuracy'])
+    model.add(Dense(2, activation="softmax"))
+    model.compile(
+        loss="categorical_crossentropy", optimizer="Nadam", metrics=["accuracy"]
+    )
     return model
