@@ -48,7 +48,6 @@ tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
 
-
 def average_hash(fname, size=16):
     img = Image.open(fname)
     img = img.convert("L")
@@ -80,7 +79,7 @@ def VideoAnalyze(Video):
         count += 1
 
 
-def GamePlayWithLearning():
+def PlayWithLearning():
     BringWindow()
     # load_model('Model\\20201218-003432model.h5')
     isGamePlay = load_model("Model\\" + str(os.listdir("Model")[-1]))
@@ -273,7 +272,7 @@ Press 4
         VideoAnalyze(Video)
 
     elif First_State == 2:
-        GamePlayWithLearning()
+        PlayWithLearning()
 
     elif First_State == 4:
         GamePlay()
