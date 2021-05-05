@@ -120,11 +120,10 @@ def PlayWithLearning():
                 isStart += 1
 
                 if is_load_model is True:
-                    if rnd == 1 or rnd == 2:
+                    if rnd in [1, 2]:
                         save_path = "stay"
                         print("RAND Stay")
-                        pass
-                    elif rnd == 3 or rnd == 4:
+                    elif rnd in [3, 4]:
                         save_path = "up"
                         Jump()
                         print("RAND Up")
