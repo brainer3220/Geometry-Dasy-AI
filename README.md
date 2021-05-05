@@ -1,4 +1,4 @@
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/brainer3220/Geometry-Dasy-AI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/brainer3220/Geometry-Dasy-AI/alerts/)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/brainer3220/Geometry-Dasy-AI.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/brainer3220/Geometry-Dasy-AI/alerts/) [![CodeFactor](https://www.codefactor.io/repository/github/brainer3220/geometry-dasy-ai/badge)](https://www.codefactor.io/repository/github/brainer3220/geometry-dasy-ai)
 
 # Introduce
 
