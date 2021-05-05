@@ -135,7 +135,6 @@ def PlayWithLearning():
                         if tmp == 1:
                             save_path = "stay"
                             print("Stay")
-                            pass
                         else:
                             save_path = "up"
                             Jump()
@@ -213,7 +212,6 @@ def PlayWithLearning():
                 # time.sleep(0)
 
                 Retry()
-                continue
             else:
                 print(
                     "This may issue is an issue where AI is slow to detect the image on the screen."
