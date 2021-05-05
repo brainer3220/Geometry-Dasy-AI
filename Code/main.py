@@ -96,10 +96,9 @@ def PlayWithLearning():
 
             Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
 
-            play_now = (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
-                                       axis=1) == 1) == True
 
-            if play_now is True:
+            if ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
+                                       axis=1) == 1) == True) is True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
                     if not os.path.exists("tmp"):
@@ -154,10 +153,12 @@ def PlayWithLearning():
                 cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png",
                             Game_Scr)
 
-            elif play_now == False and isStart < 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
+                                       axis=1) == 1) == True) == False and isStart < 1:
                 print("Go!")
 
-            elif play_now == False and isStart > 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
+                                       axis=1) == 1) == True) == False and isStart > 1:
                 play_time = time.time() - play_time
                 print("What are you doing?")
 
