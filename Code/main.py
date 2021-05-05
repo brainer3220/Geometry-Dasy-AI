@@ -99,7 +99,7 @@ def PlayWithLearning():
             play_now = (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
                                        axis=1) == 1) == True
 
-            if play_now == True:
+            if play_now is True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
                     if not os.path.exists("tmp"):
@@ -120,7 +120,7 @@ def PlayWithLearning():
 
                 isStart += 1
 
-                if is_load_model == True:
+                if is_load_model is True:
                     if rnd == 1 or rnd == 2:
                         save_path = "stay"
                         print("RAND Stay")
