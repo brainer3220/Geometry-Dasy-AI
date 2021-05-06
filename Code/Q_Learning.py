@@ -1,11 +1,11 @@
-import numpy as np
 import random
 
+import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import (Conv2D, Dense, Dropout, Flatten,
+                                     MaxPooling2D)
+from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
-from tensorflow.keras.models import Sequential, Model
 
 
 def DQN():

@@ -1,6 +1,6 @@
-from baselines.common.atari_wrappers import make_atari, wrap_deepmind
 import numpy as np
 import tensorflow as tf
+from baselines.common.atari_wrappers import make_atari, wrap_deepmind
 from tensorflow import keras
 from tensorflow.keras import layers
 

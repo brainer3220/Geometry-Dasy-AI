@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, Dense, MaxPooling2D, Dropout, Flatten
+from tensorflow.keras.layers import (Conv2D, Dense, Dropout, Flatten,
+                                     MaxPooling2D)
 from tensorflow.keras.models import Model
 
 
