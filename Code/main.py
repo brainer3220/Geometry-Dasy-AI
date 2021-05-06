@@ -50,7 +50,6 @@ tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
 
-
 def load_model():
     try:
         bin_img_clssf = load_model("Model\\" + str(os.listdir("Model")[-1]))
@@ -59,7 +58,6 @@ def load_model():
     except:
         bin_img_clssf = ImageClassf()
         print("Model load 실패")
-
     return bin_img_clssf
 
 
