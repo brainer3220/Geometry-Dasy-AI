@@ -19,5 +19,3 @@ workflows:
   main:
     jobs:
       - build-and-test
-      orbs:
-    pytest: thekevjames/pytest@0.0.60
