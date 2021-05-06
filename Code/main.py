@@ -66,6 +66,25 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
 
+def ImportImageDataSet():
+    return tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="training",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        ), tf.keras.preprocessing.image_dataset_from_directory(
+            "Photo\\isPlay",
+            validation_split=0.2,
+            subset="validation",
+            shuffle=True,
+            seed=RANDOM_STATE,
+            label_mode="categorical",
+            image_size=(640, 360),
+        )
+
 
 def VideoAnalyze(Video):
     Vidcap = cv2.VideoCapture(Video)
@@ -276,24 +295,8 @@ Press 4
         GamePlay()
 
     elif First_State == 3:
-        train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
-            validation_split=0.2,
-            subset="training",
-            shuffle=True,
-            seed=RANDOM_STATE,
-            label_mode="categorical",
-            image_size=(640, 360),
-        )
-        validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
-            validation_split=0.2,
-            subset="validation",
-            shuffle=True,
-            seed=RANDOM_STATE,
-            label_mode="categorical",
-            image_size=(640, 360),
-        )
+        train_dataset, validation_dataset = ImportImageDataSet()
+
         # train_dataset = train_dataset.cache().shuffle(30).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         print("Load Dataset")
 
