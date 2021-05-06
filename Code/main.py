@@ -24,8 +24,7 @@ from tensorflow.keras.models import load_model
 
 np.set_printoptions(suppress=True)
 
-log_dir = "logs/fit/" + datetime.datetime.now().strftime(
-            "%Y%m%d-%H%M%S")
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 Epsilon = 1  # Random probability
 Epsilon_Minimum_Value = 0.001  # epsilon의 최소값
@@ -53,14 +52,12 @@ tf.random.set_seed(RANDOM_STATE)
 
 def load_model():
     try:
-        bin_img_clssf = load_model("Model\\" +
-                                str(os.listdir("Model")[-1]))
+        bin_img_clssf = load_model("Model\\" + str(os.listdir("Model")[-1]))
         # bin_img_clssf = ImageClassf()
         print("Model load 성공")
     except:
         bin_img_clssf = ImageClassf()
         print("Model load 실패")
-    
     return bin_img_clssf
 
 
@@ -82,24 +79,25 @@ Game_Scr_pos = {"left": 16, "top": 54, "height": 483, "width": 789}
 # Where to click the button on the emulator.
 Game_Src_Click_pos = [379, 283]
 
+
 def ImportImageDataSet():
     return tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
-            validation_split=0.2,
-            subset="training",
-            shuffle=True,
-            seed=RANDOM_STATE,
-            label_mode="categorical",
-            image_size=(640, 360),
-        ), tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
-            validation_split=0.2,
-            subset="validation",
-            shuffle=True,
-            seed=RANDOM_STATE,
-            label_mode="categorical",
-            image_size=(640, 360),
-        )
+        "Photo\\isPlay",
+        validation_split=0.2,
+        subset="training",
+        shuffle=True,
+        seed=RANDOM_STATE,
+        label_mode="categorical",
+        image_size=(640, 360),
+    ), tf.keras.preprocessing.image_dataset_from_directory(
+        "Photo\\isPlay",
+        validation_split=0.2,
+        subset="validation",
+        shuffle=True,
+        seed=RANDOM_STATE,
+        label_mode="categorical",
+        image_size=(640, 360),
+    )
 
 
 def VideoAnalyze(Video):
@@ -131,9 +129,8 @@ def PlayWithLearning():
 
             Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
 
-
-            if ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
-                                       axis=1) == 1) == True) is True:
+            if ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                 == 1) == True) is True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
                     if not os.path.exists("tmp"):
@@ -186,12 +183,12 @@ def PlayWithLearning():
                 cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png",
                             Game_Scr)
 
-            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
-                                       axis=1) == 1) == True) == False and isStart < 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                   == 1) == True) == False and isStart < 1:
                 print("Go!")
 
-            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy),
-                                       axis=1) == 1) == True) == False and isStart > 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                   == 1) == True) == False and isStart > 1:
                 play_time = time.time() - play_time
                 print("What are you doing?")
 
