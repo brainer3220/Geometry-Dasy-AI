@@ -1,6 +1,6 @@
 tensorflow >= 2.4.0
 pyautogui
 numpy
-open-cv
+opencv-python
 mss
 pag
