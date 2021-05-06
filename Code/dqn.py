@@ -123,13 +123,11 @@ while True:  # Run until solved
         if frame_count % update_after_actions == 0 and len(done_history) > batch_size:
 
             # Get indices of samples for replay buffers
-            indices = np.random.choice(
-                range(len(done_history)), size=batch_size)
+            indices = np.random.choice(range(len(done_history)), size=batch_size)
 
             # Using list comprehension to sample from replay buffer
             state_sample = np.array([state_history[i] for i in indices])
-            state_next_sample = np.array(
-                [state_next_history[i] for i in indices])
+            state_next_sample = np.array([state_next_history[i] for i in indices])
             rewards_sample = [rewards_history[i] for i in indices]
             action_sample = [action_history[i] for i in indices]
             done_sample = tf.convert_to_tensor(
@@ -145,8 +143,7 @@ while True:  # Run until solved
             )
 
             # If final frame set the last value to -1
-            updated_q_values = updated_q_values * \
-                (1 - done_sample) - done_sample
+            updated_q_values = updated_q_values * (1 - done_sample) - done_sample
 
             # Create a mask so we only calculate loss on the updated Q-values
             masks = tf.one_hot(action_sample, num_actions)
