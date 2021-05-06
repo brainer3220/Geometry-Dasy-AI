@@ -51,6 +51,19 @@ tf.random.set_seed(RANDOM_STATE)
 
 # Funciton
 
+def load_model():
+    try:
+        bin_img_clssf = load_model("Model\\" +
+                                str(os.listdir("Model")[-1]))
+        # bin_img_clssf = ImageClassf()
+        print("Model load 성공")
+    except:
+        bin_img_clssf = ImageClassf()
+        print("Model load 실패")
+    
+    return bin_img_clssf
+
+
 def average_hash(fname, size=16):
     img = Image.open(fname)
     img = img.convert("L")
@@ -243,7 +256,7 @@ def PlayWithLearning():
 def GamePlay():
     np.set_printoptions(suppress=True)
 
-    # model = load_model("../Model/Keras/keras_model.h5", custom_objects=None)
+    model = load_model()
 
     while True:
         with mss.mss() as sct:
@@ -312,14 +325,7 @@ Press 4
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
                                                               histogram_freq=1)
 
-        try:
-            bin_img_clssf = load_model("Model\\" +
-                                       str(os.listdir("Model")[-1]))
-            # bin_img_clssf = ImageClassf()
-            print("Model load 성공")
-        except:
-            bin_img_clssf = ImageClassf()
-            print("Model load 실패")
+        bin_img_clssf = load_model()
 
         history = bin_img_clssf.fit(
             train_dataset,
