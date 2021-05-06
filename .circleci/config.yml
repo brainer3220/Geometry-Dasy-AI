@@ -12,6 +12,9 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
+          command: pip install -r requirements.txt
+          name: Test
+      - run:
           command: ./manage.py test
           name: Test
 
