@@ -9,28 +9,41 @@ from tensorflow.keras.models import Model
 
 
 def QNetConv(input_img):
-    conv2d_1 = tf.keras.layers.Conv2D(
-        120, 60, 3, padding="same", activation="relu", input_shape=(640, 360, 3)
-    )(input_img)
-    pool_1 = tf.keras.layers.MaxPool2D(pool_size=(65, 25), padding="same")(conv2d_1)
+    conv2d_1 = tf.keras.layers.Conv2D(120,
+                                      60,
+                                      3,
+                                      padding="same",
+                                      activation="relu",
+                                      input_shape=(640, 360, 3))(input_img)
+    pool_1 = tf.keras.layers.MaxPool2D(pool_size=(65, 25),
+                                       padding="same")(conv2d_1)
     tf.keras.layers.Dropout(0.5)(pool_1)
 
-    conv2d_2 = tf.keras.layers.Conv2D(60, 30, 3, padding="same", activation="relu")(
-        pool_1
-    )
-    pool_2 = tf.keras.layers.MaxPool2D(pool_size=(65, 25), padding="same")(conv2d_2)
+    conv2d_2 = tf.keras.layers.Conv2D(60,
+                                      30,
+                                      3,
+                                      padding="same",
+                                      activation="relu")(pool_1)
+    pool_2 = tf.keras.layers.MaxPool2D(pool_size=(65, 25),
+                                       padding="same")(conv2d_2)
     tf.keras.layers.Dropout(0.5)(pool_2)
 
-    conv2d_3 = tf.keras.layers.Conv2D(60, 25, 3, padding="same", activation="relu")(
-        pool_2
-    )
-    pool_3 = tf.keras.layers.MaxPool2D(pool_size=(65, 25), padding="same")(conv2d_3)
+    conv2d_3 = tf.keras.layers.Conv2D(60,
+                                      25,
+                                      3,
+                                      padding="same",
+                                      activation="relu")(pool_2)
+    pool_3 = tf.keras.layers.MaxPool2D(pool_size=(65, 25),
+                                       padding="same")(conv2d_3)
     tf.keras.layers.Dropout(0.5)(pool_3)
 
-    conv2d_4 = tf.keras.layers.Conv2D(120, 60, 3, padding="same", activation="relu")(
-        pool_3
-    )
-    pool_4 = tf.keras.layers.MaxPool2D(pool_size=(65, 25), padding="same")(conv2d_4)
+    conv2d_4 = tf.keras.layers.Conv2D(120,
+                                      60,
+                                      3,
+                                      padding="same",
+                                      activation="relu")(pool_3)
+    pool_4 = tf.keras.layers.MaxPool2D(pool_size=(65, 25),
+                                       padding="same")(conv2d_4)
     tf.keras.layers.Dropout(0.5)(pool_4)
     flatten = tf.keras.layers.Flatten()(pool_4)
     return flatten
