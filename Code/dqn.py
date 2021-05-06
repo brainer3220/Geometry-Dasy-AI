@@ -1,6 +1,7 @@
-from baselines.common.atari_wrappers import make_atari, wrap_deepmind
 import numpy as np
 import tensorflow as tf
+from baselines.common.atari_wrappers import make_atari
+from baselines.common.atari_wrappers import wrap_deepmind
 from tensorflow import keras
 from tensorflow.keras import layers
 
@@ -24,6 +25,7 @@ env.seed(seed)
 
 num_actions = 2
 
+
 def create_q_model():
     # Network defined by the Deepmind paper
     inputs = layers.Input(shape=(640, 360, 3))
@@ -40,6 +42,7 @@ def create_q_model():
 
     return keras.Model(inputs=inputs, outputs=action)
 
+
 # The first model makes the predictions for Q-values which are used to
 # make a action.
 model = create_q_model()
@@ -47,7 +50,6 @@ model = create_q_model()
 # The weights of a target model get updated every 10000 steps thus when the
 # loss between the Q-values is calculated the target Q-value is stable.
 model_target = create_q_model()
-
 
 # In the Deepmind paper they use RMSProp however then Adam optimizer
 # improves training time
@@ -87,7 +89,8 @@ while True:  # Run until solved
         frame_count += 1
 
         # Use epsilon-greedy for exploration
-        if frame_count < epsilon_random_frames or epsilon > np.random.rand(1)[0]:
+        if frame_count < epsilon_random_frames or epsilon > np.random.rand(
+                1)[0]:
             # Take random action
             action = np.random.choice(num_actions)
         else:
@@ -118,30 +121,32 @@ while True:  # Run until solved
         state = state_next
 
         # Update every fourth frame and once batch size is over 32
-        if frame_count % update_after_actions == 0 and len(done_history) > batch_size:
+        if frame_count % update_after_actions == 0 and len(
+                done_history) > batch_size:
 
             # Get indices of samples for replay buffers
-            indices = np.random.choice(range(len(done_history)), size=batch_size)
+            indices = np.random.choice(range(len(done_history)),
+                                       size=batch_size)
 
             # Using list comprehension to sample from replay buffer
             state_sample = np.array([state_history[i] for i in indices])
-            state_next_sample = np.array([state_next_history[i] for i in indices])
+            state_next_sample = np.array(
+                [state_next_history[i] for i in indices])
             rewards_sample = [rewards_history[i] for i in indices]
             action_sample = [action_history[i] for i in indices]
             done_sample = tf.convert_to_tensor(
-                [float(done_history[i]) for i in indices]
-            )
+                [float(done_history[i]) for i in indices])
 
             # Build the updated Q-values for the sampled future states
             # Use the target model for stability
             future_rewards = model_target.predict(state_next_sample)
             # Q value = reward + discount factor * expected future reward
             updated_q_values = rewards_sample + gamma * tf.reduce_max(
-                future_rewards, axis=1
-            )
+                future_rewards, axis=1)
 
             # If final frame set the last value to -1
-            updated_q_values = updated_q_values * (1 - done_sample) - done_sample
+            updated_q_values = updated_q_values * (1 -
+                                                   done_sample) - done_sample
 
             # Create a mask so we only calculate loss on the updated Q-values
             masks = tf.one_hot(action_sample, num_actions)
