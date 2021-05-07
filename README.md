@@ -16,7 +16,7 @@ This Project is make AI for Geomatry Dash and other.
 - Tensorflow 2.4.0
 - pyautogui
 - numpy
-- open-cv
+- Opencv-Python
 - mss
 - pag
 - Geometry Dash Environment
