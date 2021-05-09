@@ -84,7 +84,7 @@ Game_Src_Click_pos = [379, 283]
 
 def ImportImageDataSet():
     return tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
+            f"Photo/isPlay",
             validation_split=0.2,
             subset="training",
             shuffle=True,
@@ -92,7 +92,7 @@ def ImportImageDataSet():
             label_mode="categorical",
             image_size=(640, 360),
         ), tf.keras.preprocessing.image_dataset_from_directory(
-            "Photo\\isPlay",
+            f"Photo/isPlay",
             validation_split=0.2,
             subset="validation",
             shuffle=True,
@@ -117,8 +117,8 @@ def VideoAnalyze(Video):
 def PlayWithLearning():
     BringWindow()
     # load_model('Model\\20201218-003432model.h5')
-    isGamePlay = load_model("Model\\" + str(os.listdir("Model")[-1]))
-    print("Model\\" + str(os.listdir("Model")[-1]))
+    isGamePlay = load_model(f"Model/" + str(os.listdir("Model")[-1]))
+    print(f"Model/" + str(os.listdir("Model")[-1]))
     # last_select = []
     isStart = 0
 
