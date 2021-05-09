@@ -131,10 +131,8 @@ def PlayWithLearning():
 
             Game_Scr_numpy = np.resize(Game_Scr, (1, 640, 360, 3))
 
-            if (
-                (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1)
-                == True
-            ) is True:
+            if ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                 == 1) == True) is True:
                 rnd = random.randint(1, 10)
                 if isStart < 1:
                     if not os.path.exists("tmp"):
@@ -164,7 +162,8 @@ def PlayWithLearning():
                         Jump()
                         print("RAND Up")
                     else:
-                        tmp = tf.math.argmax(dqn.predict(Game_Scr_numpy), axis=1)
+                        tmp = tf.math.argmax(dqn.predict(Game_Scr_numpy),
+                                             axis=1)
 
                         if tmp == 1:
                             save_path = "stay"
@@ -183,18 +182,15 @@ def PlayWithLearning():
                         print("up")
                     else:
                         print("It's a problem")
-                cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png", Game_Scr)
+                cv2.imwrite(f"tmp\\{save_path}\\{int(time.time())}.png",
+                            Game_Scr)
 
-            elif (
-                (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1)
-                == True
-            ) == False and isStart < 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                   == 1) == True) == False and isStart < 1:
                 print("Go!")
 
-            elif (
-                (tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1) == 1)
-                == True
-            ) == False and isStart > 1:
+            elif ((tf.math.argmax(isGamePlay.predict(Game_Scr_numpy), axis=1)
+                   == 1) == True) == False and isStart > 1:
                 play_time = time.time() - play_time
                 print("What are you doing?")
 
@@ -233,7 +229,8 @@ def PlayWithLearning():
                 print(x.shape, y.shape)
                 Q_net.QNet(
                     x,
-                    tf.keras.activations.tanh(tf.nn.softmax([float(play_time), 85.0])),
+                    tf.keras.activations.tanh(
+                        tf.nn.softmax([float(play_time), 85.0])),
                     y,
                 )
 
@@ -268,9 +265,9 @@ def GamePlay():
             # cv2.imshow('Game_Src', Game_Scr)
             # cv2.waitKey(0)
 
-            Game_Scr = cv2.resize(
-                Game_Scr, dsize=(960, 540), interpolation=cv2.INTER_AREA
-            )
+            Game_Scr = cv2.resize(Game_Scr,
+                                  dsize=(960, 540),
+                                  interpolation=cv2.INTER_AREA)
             x = np.array(Game_Scr).reshape(-1, 1)
 
             size = (224, 224)
@@ -289,8 +286,7 @@ if __name__ == "__main__":
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
     First_State = int(
-        input(
-            """If you want to analyze your video?
+        input("""If you want to analyze your video?
 press 1.
 
 or real time play game and real time screen analyze.
@@ -301,9 +297,7 @@ Press 3.
 
 If you gaming from real time
 Press 4
-"""
-        )
-    )
+"""))
 
     if First_State == 1:
         Video = input("Please enter a video path and video name.")
@@ -327,9 +321,8 @@ Press 4
         # cv2.imshow('Game_Src', cv2.imread(train_dataset.take(1)))
         # cv2.waitKey(1)
 
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(
-            log_dir=log_dir, histogram_freq=1
-        )
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+                                                              histogram_freq=1)
 
         bin_img_clssf = load_model()
 
@@ -341,6 +334,6 @@ Press 4
             callbacks=[tensorboard_callback],
         )
 
-        bin_img_clssf.save(
-            "Model\\" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + "model.h5"
-        )
+        bin_img_clssf.save("Model\\" +
+                           datetime.datetime.now().strftime("%Y%m%d-%H%M%S") +
+                           "model.h5")
