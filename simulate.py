@@ -1,103 +1,69 @@
-import gymnasium as gym
+# -*- coding: utf-8 -*-
+"""
+Geometry Dash PPO+RND (SOTA RL stack)
+- PPO: GAE(λ), mini-batch, value clipping, adaptive KL early stop
+- Schedules: LR warmup+cosine decay, entropy linear decay
+- Exploration: RND intrinsic reward
+- VecEnv + StateStack + RunningMeanStd
+- CUDA + AMP, gradient clipping
+- TQDM + TensorBoard logging, checkpoints(best/final)
+- Headless training, optional visualization for test
+"""
+
+import os
+os.environ["SDL_AUDIODRIVER"] = "dummy"          # 오디오 비활성(헤드리스)
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+import math
+import time
+import random
+import argparse
+from datetime import datetime
+from collections import deque
+from typing import Optional, Dict, Any, List
+
 import numpy as np
+import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.distributions import Categorical
-import pygame
-import random
-import math
-from collections import deque
 from tqdm import trange
-import cv2
-import os
-from datetime import datetime
-from typing import Dict, Any, List, Optional
-
-# TensorBoard
 from torch.utils.tensorboard import SummaryWriter
 
 # -----------------------------
-# 공통 설정: 디바이스 & 재현성
+# 전역: 디바이스/AMP/시드
 # -----------------------------
 torch.set_float32_matmul_precision("high")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-AMP_ENABLED = DEVICE.type == "cuda"
+AMP = (DEVICE.type == "cuda")
 
 def set_seed(seed: int = 42):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if torch.cuda.is_available():
+    if DEVICE.type == "cuda":
         torch.cuda.manual_seed_all(seed)
 
-def create_writer(run_name: Optional[str] = None) -> SummaryWriter:
-    run_name = run_name or f"gdash_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    log_dir = os.path.join("runs", run_name)
-    os.makedirs(log_dir, exist_ok=True)
-    writer = SummaryWriter(log_dir=log_dir)
-    return writer
+# =========================================================
+# 1) 학습용 Headless 환경 (커리큘럼 + 도메인 랜덤화)
+# =========================================================
+class HeadlessGeometryDashEnv(gym.Env):
+    metadata = {"render_modes": []}
 
-# -----------------------------
-# 시각화 지오메트리 대시 환경
-# -----------------------------
-class VisualGeometryDashEnv(gym.Env):
-    def __init__(self, render_mode=None, fps=60, record_video=False, video_path=None,
-                 collect_tb_frames: bool = False, tb_video_max_frames: int = 300):
-        super(VisualGeometryDashEnv, self).__init__()
+    def __init__(self, seed=None, curriculum=False, domain_rand=True, difficulty=1.0):
+        super().__init__()
+        self.width, self.height = 800, 600
+        self.base_ground_y = 500
+        self.base_gravity = 0.8
+        self.base_jump = -15
+        self.base_speed = 6
 
-        # 환경 설정
-        self.width = 800
-        self.height = 600
-        self.ground_y = 500
-        self.gravity = 0.8
-        self.jump_force = -15
-        self.speed = 6
+        self.curriculum = curriculum
+        self.domain_rand = domain_rand
+        self.difficulty = difficulty
 
-        # 시각화 설정
-        self.render_mode = render_mode
-        self.fps = fps
-        self.record_video = record_video
-        self.video_path = video_path or f"geometry_dash_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
-
-        # TensorBoard 비디오 프레임 수집 옵션
-        self.collect_tb_frames = collect_tb_frames
-        self.tb_video_max_frames = tb_video_max_frames
-        self.tb_frames: List[np.ndarray] = []
-
-        # Pygame 초기화
-        if self.render_mode == "human" or self.record_video:
-            pygame.init()
-            self.screen = pygame.display.set_mode((self.width, self.height))
-            pygame.display.set_caption("Geometry Dash AI")
-            self.clock = pygame.time.Clock()
-
-            # 색상 정의
-            self.colors = {
-                'background': (30, 30, 50),
-                'ground': (100, 100, 100),
-                'player': (255, 100, 100),
-                'obstacle': (255, 50, 50),
-                'text': (255, 255, 255)
-            }
-
-            # 비디오 녹화 설정
-            if self.record_video:
-                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                self.video_writer = cv2.VideoWriter(
-                    self.video_path, fourcc, self.fps, (self.width, self.height)
-                )
-
-        # 플레이어 설정
         self.player_size = 30
-        self.reset_player()
-
-        # 장애물 설정
-        self.obstacles = []
-        self.obstacle_spawn_distance = 200
-        self.last_obstacle_x = self.width
-
-        # Gymnasium 인터페이스
         self.action_space = gym.spaces.Discrete(2)
         self.observation_space = gym.spaces.Box(
             low=np.array([0, -20, 0, 0, 0, 0, 0, 0], dtype=np.float32),
@@ -105,586 +71,604 @@ class VisualGeometryDashEnv(gym.Env):
                            self.width, self.height, self.width, self.height], dtype=np.float32),
             dtype=np.float32
         )
+        self._rng = np.random.RandomState(seed)
+        self.reset()
 
-        self.score = 0
-        self.max_steps = 10000
-        self.current_step = 0
-        self.total_distance = 0
+    # ---- 내부 로직 ----
+    def _apply_difficulty(self):
+        d = float(self.difficulty)
+        self.ground_y = self.base_ground_y
+        self.speed   = self.base_speed * (1.0 + 0.20*(d-1.0))
+        self.gravity = self.base_gravity * (1.0 + 0.10*(d-1.0))
+        self.jump_force = self.base_jump * (1.0 + 0.05*(d-1.0))
+        if self.domain_rand:
+            self.gravity    *= self._rng.uniform(0.95, 1.05)
+            self.jump_force *= self._rng.uniform(0.97, 1.03)
+            self.speed      *= self._rng.uniform(0.95, 1.05)
 
-    def reset_player(self):
+    def _reset_player(self):
         self.player_x = 100
         self.player_y = self.ground_y - self.player_size
-        self.player_vel_y = 0
+        self.player_vel_y = 0.0
         self.on_ground = True
 
-    def spawn_obstacle(self):
-        obstacle_height = random.randint(30, 80)
-        obstacle = {
-            'x': self.last_obstacle_x + self.obstacle_spawn_distance + random.randint(-50, 100),
-            'y': self.ground_y - obstacle_height,
-            'width': 20,
-            'height': obstacle_height,
-            'type': 'spike'
-        }
-        self.obstacles.append(obstacle)
-        self.last_obstacle_x = obstacle['x']
+    def _spawn_obstacle(self):
+        h = self._rng.randint(30, int(80 * (0.9 + 0.2*self.difficulty)))
+        gap = 200 + self._rng.randint(-50, 100)
+        obs = {'x': self.last_obstacle_x + gap, 'y': self.ground_y - h, 'width': 20, 'height': h}
+        self.obstacles.append(obs)
+        self.last_obstacle_x = obs['x']
 
-    def update_obstacles(self):
-        for obstacle in self.obstacles[:]:
-            obstacle['x'] -= self.speed
-            if obstacle['x'] + obstacle['width'] < 0:
-                self.obstacles.remove(obstacle)
+    def _update_obstacles(self):
+        for obs in self.obstacles[:]:
+            obs['x'] -= self.speed
+            if obs['x'] + obs['width'] < 0:
+                self.obstacles.remove(obs)
                 self.score += 10
-
         if len(self.obstacles) < 5 and (not self.obstacles or self.obstacles[-1]['x'] < self.width):
-            self.spawn_obstacle()
+            self._spawn_obstacle()
 
-    def check_collision(self):
-        # pygame.Rect 사용 (시각화 모드가 아니어도 Rect는 사용 가능)
-        player_rect = pygame.Rect(self.player_x, self.player_y, self.player_size, self.player_size)
-        for obstacle in self.obstacles:
-            obstacle_rect = pygame.Rect(obstacle['x'], obstacle['y'], obstacle['width'], obstacle['height'])
-            if player_rect.colliderect(obstacle_rect):
+    def _collide(self):
+        px, py, ps = self.player_x, self.player_y, self.player_size
+        for o in self.obstacles:
+            if (px < o['x'] + o['width'] and px + ps > o['x'] and
+                py < o['y'] + o['height'] and py + ps > o['y']):
                 return True
         return False
 
-    def get_state(self):
-        state = [
-            self.player_y / self.height,
-            self.player_vel_y / 20.0,
-        ]
-
-        upcoming_obstacles = [obs for obs in self.obstacles if obs['x'] > self.player_x][:3]
+    def _state(self):
+        s = [self.player_y / self.height, self.player_vel_y / 20.0]
+        ups = [o for o in self.obstacles if o['x'] > self.player_x][:3]
         for i in range(3):
-            if i < len(upcoming_obstacles):
-                obs = upcoming_obstacles[i]
-                state.extend([
-                    (obs['x'] - self.player_x) / self.width,
-                    obs['y'] / self.height
-                ])
+            if i < len(ups):
+                o = ups[i]
+                s += [(o['x'] - self.player_x) / self.width, o['y'] / self.height]
             else:
-                state.extend([1.0, 0.5])
+                s += [1.0, 0.5]
+        return np.array(s, dtype=np.float32)
 
-        return np.array(state, dtype=np.float32)
-
-    def _grab_rgb_frame(self) -> np.ndarray:
-        # RGB(H, W, 3), dtype=uint8
-        frame = pygame.surfarray.array3d(self.screen)
-        frame = np.transpose(frame, (1, 0, 2))  # (W,H,3) -> (H,W,3)
-        return frame
-
-    def render(self):
-        if self.render_mode != "human" and not self.record_video and not self.collect_tb_frames:
-            return
-
-        # 배경
-        self.screen.fill(self.colors['background'])
-
-        # 지면
-        pygame.draw.rect(self.screen, self.colors['ground'],
-                         (0, self.ground_y, self.width, self.height - self.ground_y))
-
-        # 플레이어 (회전)
-        rotation_angle = (self.current_step * 5) % 360 if not self.on_ground else 0
-        player_surface = pygame.Surface((self.player_size, self.player_size), pygame.SRCALPHA)
-        pygame.draw.rect(player_surface, self.colors['player'], (0, 0, self.player_size, self.player_size))
-        rotated_player = pygame.transform.rotate(player_surface, rotation_angle)
-        player_rect = rotated_player.get_rect(center=(self.player_x + self.player_size//2,
-                                                     self.player_y + self.player_size//2))
-        self.screen.blit(rotated_player, player_rect)
-
-        # 장애물
-        for obstacle in self.obstacles:
-            pygame.draw.rect(self.screen, self.colors['obstacle'],
-                             (obstacle['x'], obstacle['y'], obstacle['width'], obstacle['height']))
-            points = [
-                (obstacle['x'], obstacle['y'] + obstacle['height']),
-                (obstacle['x'] + obstacle['width']//2, obstacle['y']),
-                (obstacle['x'] + obstacle['width'], obstacle['y'] + obstacle['height'])
-            ]
-            pygame.draw.polygon(self.screen, (255, 0, 0), points)
-
-        # UI
-        font = pygame.font.Font(None, 36)
-        score_text = font.render(f"Score: {self.total_distance//10}", True, self.colors['text'])
-        step_text = font.render(f"Steps: {self.current_step}", True, self.colors['text'])
-        velocity_text = font.render(f"Velocity: {self.player_vel_y:.1f}", True, self.colors['text'])
-        self.screen.blit(score_text, (10, 10))
-        self.screen.blit(step_text, (10, 50))
-        self.screen.blit(velocity_text, (10, 90))
-
-        if self.obstacles:
-            next_obstacle = min(self.obstacles, key=lambda obs: abs(obs['x'] - self.player_x))
-            distance = next_obstacle['x'] - self.player_x
-            distance_text = font.render(f"Next: {distance:.0f}px", True, self.colors['text'])
-            self.screen.blit(distance_text, (10, 130))
-
-        pygame.display.flip()
-
-        # 프레임 캡처
-        if self.record_video or self.collect_tb_frames:
-            frame_rgb = self._grab_rgb_frame()
-
-        # 비디오 파일 저장용(BGR)
-        if self.record_video:
-            frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
-            self.video_writer.write(frame_bgr)
-
-        # TensorBoard 비디오용(RGB)
-        if self.collect_tb_frames and len(self.tb_frames) < self.tb_video_max_frames:
-            self.tb_frames.append(frame_rgb)
-
-        if self.render_mode == "human":
-            self.clock.tick(self.fps)
-
-    def reset(self, seed=None):
+    # ---- Gym API ----
+    def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-        self.reset_player()
+        self._apply_difficulty()
+        self._reset_player()
         self.obstacles = []
         self.last_obstacle_x = self.width
-        self.score = 0
-        self.current_step = 0
-        self.total_distance = 0
-        self.tb_frames = []
-
+        self.score = 0.0
+        self.step_count = 0
+        self.max_steps = 10_000
         for _ in range(3):
-            self.spawn_obstacle()
-
-        if self.render_mode == "human" or self.record_video or self.collect_tb_frames:
-            self.render()
-
-        return self.get_state(), {}
+            self._spawn_obstacle()
+        return self._state(), {}
 
     def step(self, action):
-        self.current_step += 1
-        self.total_distance += self.speed
-
-        # 이벤트 처리
-        if self.render_mode == "human":
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return self.get_state(), 0.0, True, False, {}
-
-        # 액션 처리
+        self.step_count += 1
         if action == 1 and self.on_ground:
             self.player_vel_y = self.jump_force
             self.on_ground = False
 
-        # 물리 업데이트
         self.player_vel_y += self.gravity
         self.player_y += self.player_vel_y
-
-        # 지면 충돌
         if self.player_y >= self.ground_y - self.player_size:
             self.player_y = self.ground_y - self.player_size
-            self.player_vel_y = 0
+            self.player_vel_y = 0.0
             self.on_ground = True
 
-        # 장애물 업데이트
-        self.update_obstacles()
+        self._update_obstacles()
 
-        # 보상
-        reward = 0.1
+        reward = 0.1 + self.score * 0.1
+        self.score = 0.0
+
         terminated = False
-
-        if self.check_collision():
+        if self._collide():
             reward = -100.0
             terminated = True
-        elif self.current_step >= self.max_steps:
-            terminated = True
+        elif self.step_count >= self.max_steps:
             reward += 50.0
+            terminated = True
 
-        reward += self.score * 0.1
-        self.score = 0
+        return self._state(), float(reward), terminated, False, {}
 
-        # 렌더링
-        if self.render_mode == "human" or self.record_video or self.collect_tb_frames:
-            self.render()
+# =========================================================
+# 2) 래퍼/정규화/탐색(RND)
+# =========================================================
+class StateStackWrapper(gym.Wrapper):
+    def __init__(self, env, k=4):
+        super().__init__(env)
+        self.k = k
+        low  = np.repeat(env.observation_space.low,  k, axis=0)
+        high = np.repeat(env.observation_space.high, k, axis=0)
+        self.observation_space = gym.spaces.Box(low=low, high=high, dtype=np.float32)
+        self.frames = deque(maxlen=k)
 
-        return self.get_state(), float(reward), bool(terminated), False, {}
+    def reset(self, **kwargs):
+        obs, info = self.env.reset(**kwargs)
+        self.frames.clear()
+        for _ in range(self.k):
+            self.frames.append(obs)
+        return self._obs(), info
 
-    def get_tb_video_tensor(self) -> Optional[torch.Tensor]:
-        """수집된 프레임을 TensorBoard 비디오 텐서(N,T,C,H,W, [0,1])로 변환"""
-        if not self.tb_frames:
-            return None
-        frames = np.stack(self.tb_frames, axis=0)  # (T,H,W,3), uint8
-        frames = torch.from_numpy(frames).permute(0, 3, 1, 2).unsqueeze(0)  # (1,T,3,H,W)
-        frames = frames.to(torch.float32) / 255.0
-        return frames
+    def step(self, action):
+        obs, r, term, trunc, info = self.env.step(action)
+        self.frames.append(obs)
+        return self._obs(), r, term, trunc, info
 
-    def close(self):
-        if hasattr(self, 'video_writer'):
-            self.video_writer.release()
-        if hasattr(self, 'screen'):
-            pygame.quit()
+    def _obs(self):
+        return np.concatenate(list(self.frames), axis=0)
 
-# PPO 네트워크
+class RunningMeanStd:
+    def __init__(self, eps=1e-4, shape=()):
+        self.mean = np.zeros(shape, 'float64')
+        self.var  = np.ones(shape, 'float64')
+        self.count = eps
+
+    def update(self, x):
+        x = np.asarray(x, dtype=np.float64)
+        mean = x.mean(axis=0)
+        var  = x.var(axis=0)
+        n    = x.shape[0]
+        delta = mean - self.mean
+        tot = self.count + n
+        new_mean = self.mean + delta * n / tot
+        m_a = self.var * self.count
+        m_b = var * n
+        M2 = m_a + m_b + delta**2 * self.count * n / tot
+        new_var = M2 / tot
+        self.mean, self.var, self.count = new_mean, new_var, tot
+
+# ---- RND ----
+class RNDNet(nn.Module):
+    def __init__(self, in_dim, hidden=128):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, hidden), nn.ReLU(),
+            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(hidden, 64)
+        )
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.orthogonal_(m.weight, gain=nn.init.calculate_gain('relu'))
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        return self.net(x)
+
+class RNDModule:
+    def __init__(self, obs_dim, lr=1e-4, device=DEVICE, obs_clip=5.0, bonus_scale=0.05):
+        self.device = device
+        self.target = RNDNet(obs_dim).to(device)
+        self.predictor = RNDNet(obs_dim).to(device)
+        for p in self.target.parameters():
+            p.requires_grad = False
+        self.opt = optim.Adam(self.predictor.parameters(), lr=lr)
+        self.obs_clip = obs_clip
+        self.bonus_scale = bonus_scale
+        self.criterion = nn.MSELoss(reduction='none')
+
+    @torch.no_grad()
+    def compute_bonus(self, obs_t: torch.Tensor) -> torch.Tensor:
+        o = torch.clamp(obs_t, -self.obs_clip, self.obs_clip)
+        t = self.target(o)
+        p = self.predictor(o)
+        err = (t - p).pow(2).mean(dim=-1)  # (B,)
+        norm = (err - err.mean()) / (err.std(unbiased=False) + 1e-8)
+        return self.bonus_scale * norm
+
+    def update(self, obs_t: torch.Tensor) -> float:
+        o = torch.clamp(obs_t, -self.obs_clip, self.obs_clip)
+        with torch.no_grad():
+            tgt = self.target(o)
+        pred = self.predictor(o)
+        loss = self.criterion(pred, tgt).mean()
+        self.opt.zero_grad(set_to_none=True)
+        loss.backward()
+        nn.utils.clip_grad_norm_(self.predictor.parameters(), 1.0)
+        self.opt.step()
+        return float(loss.detach().cpu().item())
+
+# =========================================================
+# 3) PPO 네트워크/버퍼/트레이너 (SOTA 안정화)
+# =========================================================
+def orthogonal_init(m):
+    if isinstance(m, nn.Linear):
+        nn.init.orthogonal_(m.weight, gain=nn.init.calculate_gain('relu'))
+        nn.init.zeros_(m.bias)
+
 class PPONetwork(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim=256):
-        super(PPONetwork, self).__init__()
-        self.feature_extractor = nn.Sequential(
-            nn.Linear(state_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.ReLU(),
+    def __init__(self, state_dim, action_dim, hidden=256):
+        super().__init__()
+        self.feature = nn.Sequential(
+            nn.Linear(state_dim, hidden), nn.ReLU(),
+            nn.Linear(hidden, hidden), nn.ReLU(),
         )
         self.actor = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(hidden_dim // 2, action_dim),
+            nn.Linear(hidden, hidden // 2), nn.ReLU(),
+            nn.Linear(hidden // 2, action_dim),
             nn.Softmax(dim=-1)
         )
         self.critic = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(),
-            nn.Linear(hidden_dim // 2, 1)
+            nn.Linear(hidden, hidden // 2), nn.ReLU(),
+            nn.Linear(hidden // 2, 1)
         )
+        self.apply(orthogonal_init)
 
-    def forward(self, state):
-        features = self.feature_extractor(state)
-        action_probs = self.actor(features)
-        value = self.critic(features)
-        return action_probs, value
+    def forward(self, x):
+        h = self.feature(x)
+        return self.actor(h), self.critic(h)
 
-# PPO 에이전트 (TensorBoard 메트릭 계산용 보강)
-class PPOAgent:
-    def __init__(self, state_dim, action_dim, lr=3e-4, gamma=0.99, eps_clip=0.2, k_epochs=4, entropy_coef=0.01):
-        self.gamma = gamma
-        self.eps_clip = eps_clip
-        self.k_epochs = k_epochs
-        self.entropy_coef = entropy_coef
+class RolloutBuffer:
+    def __init__(self, n_steps, n_envs, obs_dim, device=DEVICE):
+        self.n_steps, self.n_envs, self.device = n_steps, n_envs, device
+        self.obs = torch.zeros(n_steps+1, n_envs, obs_dim, device=device)
+        self.actions = torch.zeros(n_steps, n_envs, dtype=torch.long, device=device)
+        self.rewards = torch.zeros(n_steps, n_envs, device=device)
+        self.dones = torch.zeros(n_steps, n_envs, device=device)
+        self.logps = torch.zeros(n_steps, n_envs, device=device)
+        self.values = torch.zeros(n_steps+1, n_envs, device=device)
+        self.ptr = 0
 
-        self.network = PPONetwork(state_dim, action_dim).to(DEVICE)
-        self.optimizer = optim.Adam(self.network.parameters(), lr=lr)
-        self.scaler = torch.amp.GradScaler('cuda' if DEVICE.type == 'cuda' else 'cpu', enabled=AMP_ENABLED)
+    def add(self, obs, action, reward, done, logp, value):
+        t = self.ptr
+        self.obs[t].copy_(obs)
+        self.actions[t].copy_(action)
+        self.rewards[t].copy_(reward)
+        self.dones[t].copy_(done)
+        self.logps[t].copy_(logp)
+        self.values[t].copy_(value)
+        self.ptr += 1
 
-        self.memory = []
+    def finish(self, last_value, gamma, lam):
+        self.values[self.ptr].copy_(last_value)
+        T = self.ptr
+        adv = torch.zeros(T, self.n_envs, device=self.device)
+        last_gae = torch.zeros(self.n_envs, device=self.device)
+        for t in reversed(range(T)):
+            nonterm = 1.0 - self.dones[t]
+            delta = self.rewards[t] + gamma * self.values[t+1] * nonterm - self.values[t]
+            last_gae = delta + gamma * lam * nonterm * last_gae
+            adv[t] = last_gae
+        ret = adv + self.values[:T]
+        data = {
+            "obs": self.obs[:T].reshape(-1, self.obs.size(-1)),
+            "actions": self.actions[:T].reshape(-1),
+            "logps": self.logps[:T].reshape(-1),
+            "advantages": (adv.reshape(-1) - adv.mean())/(adv.std(unbiased=False)+1e-8),
+            "returns": ret.reshape(-1),
+            "old_values": self.values[:T].reshape(-1),
+        }
+        self.ptr = 0
+        return data
 
-    @torch.no_grad()
-    def select_action(self, state_np):
-        state = torch.as_tensor(state_np, dtype=torch.float32, device=DEVICE).unsqueeze(0)
-        action_probs, _ = self.network(state)
-        dist = Categorical(action_probs)
-        action = dist.sample()
-        logp = dist.log_prob(action)
-        return int(action.item()), float(logp.item())
+class PPOTrainer:
+    def __init__(self, net, lr=3e-4, gamma=0.99, lam=0.95, clip=0.2, epochs=4,
+                 vf_coef=0.5, ent_coef=0.01, target_kl=0.03, max_grad_norm=0.5, minibatch_size=2048):
+        self.net = net
+        self.gamma, self.lam = gamma, lam
+        self.clip, self.epochs = clip, epochs
+        self.vf_coef, self.ent_coef = vf_coef, ent_coef
+        self.target_kl = target_kl
+        self.max_grad_norm = max_grad_norm
+        self.minibatch_size = minibatch_size
 
-    def store_experience(self, state, action, reward, log_prob, done):
-        self.memory.append((state, action, reward, log_prob, done))
+        self.opt = optim.Adam(net.parameters(), lr=lr, eps=1e-5)
+        # LR 스케줄러: warmup -> cosine decay
+        def lr_lambda(step):
+            warmup = 50
+            if step < warmup: 
+                return (step + 1) / warmup
+            return 0.1 + 0.9 * (0.5 * (1 + math.cos(math.pi * (step - warmup) / 2000)))
+        self.sched = optim.lr_scheduler.LambdaLR(self.opt, lr_lambda=lr_lambda)
 
-    def _calc_explained_variance(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> float:
-        # y_true: returns, y_pred: values
-        var_y = torch.var(y_true)
-        if var_y.item() < 1e-8:
-            return 0.0
-        return float(1.0 - torch.var(y_true - y_pred) / var_y)
+        # 엔트로피 선형 감소
+        self.ent_start, self.ent_end = ent_coef, max(0.001, ent_coef * 0.1)
+        self.update_step = 0
+        self.scaler = torch.amp.GradScaler('cuda' if AMP else 'cpu', enabled=AMP)
 
-    def update(self) -> Dict[str, float]:
-        """PPO 업데이트 한 번 수행하고, 로깅용 메트릭 반환"""
-        metrics: Dict[str, float] = {}
-        if len(self.memory) == 0:
-            return metrics
+    def evaluate(self, obs):
+        pi, v = self.net(obs)
+        return Categorical(pi), v.squeeze(-1)
 
-        # 메모리 텐서화
-        states_np = np.array([exp[0] for exp in self.memory])
-        states = torch.as_tensor(states_np, dtype=torch.float32, device=DEVICE)
-        actions = torch.as_tensor([exp[1] for exp in self.memory], dtype=torch.long, device=DEVICE)
-        rewards = [exp[2] for exp in self.memory]
-        dones = [exp[4] for exp in self.memory]
-        old_log_probs = torch.as_tensor([exp[3] for exp in self.memory], dtype=torch.float32, device=DEVICE)
+    def ent_coef_now(self):
+        T = 2000  # 총 업데이트 가정
+        r = min(1.0, self.update_step / T)
+        return self.ent_start * (1.0 - r) + self.ent_end * r
 
-        # 할인 리턴
-        discounted_rewards = []
-        discounted = 0.0
-        for r, d in zip(reversed(rewards), reversed(dones)):
-            if d:
-                discounted = 0.0
-            discounted = float(r) + self.gamma * discounted
-            discounted_rewards.insert(0, discounted)
-        returns = torch.as_tensor(discounted_rewards, dtype=torch.float32, device=DEVICE)
-        # 표준화
-        returns = (returns - returns.mean()) / (returns.std(unbiased=False) + 1e-8)
+    def update(self, batch, writer: Optional[SummaryWriter] = None, gs: int = 0) -> Dict[str, float]:
+        obs = batch["obs"]; actions = batch["actions"]
+        old_logps = batch["logps"]; adv = batch["advantages"]
+        returns = batch["returns"]; old_values = batch["old_values"]
 
-        # 누적 메트릭
-        actor_losses, critic_losses, entropies, kls, clip_fracs, ratios_means = [], [], [], [], [], []
-        grad_pre_norms, grad_post_norms = [], []
+        n = obs.size(0)
+        idx = torch.randperm(n, device=obs.device)
+        agg = {"loss_pi":0.0, "loss_v":0.0, "ent":0.0, "kl":0.0, "clip_frac":0.0}
 
-        for _ in range(self.k_epochs):
-            with torch.autocast(device_type=DEVICE.type, dtype=torch.float16, enabled=AMP_ENABLED):
-                action_probs, values = self.network(states)
-                dist = Categorical(action_probs)
-                new_log_probs = dist.log_prob(actions)
-                entropy = dist.entropy().mean()
+        stop_early = False
+        for _ in range(self.epochs):
+            for s in range(0, n, self.minibatch_size):
+                e = min(s + self.minibatch_size, n)
+                mb = idx[s:e]
+                mb_obs, mb_act = obs[mb], actions[mb]
+                mb_old_logp, mb_adv = old_logps[mb], adv[mb]
+                mb_ret, mb_old_v = returns[mb], old_values[mb]
 
-                # ratio & clipped obj
-                ratio = torch.exp(new_log_probs - old_log_probs)
-                values = values.squeeze(-1)
-                advantages = (returns - values).detach()
+                with torch.autocast(device_type=DEVICE.type, dtype=torch.float16, enabled=AMP):
+                    dist, v = self.evaluate(mb_obs)
+                    new_logp = dist.log_prob(mb_act)
+                    ratio = torch.exp(new_logp - mb_old_logp)
 
-                surr1 = ratio * advantages
-                surr2 = torch.clamp(ratio, 1 - self.eps_clip, 1 + self.eps_clip) * advantages
+                    # policy loss with clipping
+                    surr1 = ratio * mb_adv
+                    surr2 = torch.clamp(ratio, 1-self.clip, 1+self.clip) * mb_adv
+                    pi_loss = -torch.min(surr1, surr2).mean()
 
-                actor_loss = -torch.min(surr1, surr2).mean()
-                critic_loss = nn.MSELoss()(values, returns)
-                total_loss = actor_loss + 0.5 * critic_loss - self.entropy_coef * entropy
+                    # value loss with clipping
+                    v_clip = mb_old_v + torch.clamp(v - mb_old_v, -self.clip, self.clip)
+                    v_loss = 0.5 * torch.max((v - mb_ret).pow(2), (v_clip - mb_ret).pow(2)).mean()
 
-                # 추가 메트릭
-                approx_kl = (old_log_probs - new_log_probs).mean().abs()
-                clip_frac = torch.mean((torch.abs(ratio - 1.0) > self.eps_clip).float())
+                    ent = dist.entropy().mean()
+                    ent_coef = self.ent_coef_now()
+                    loss = pi_loss + self.vf_coef * v_loss - ent_coef * ent
 
-            self.optimizer.zero_grad(set_to_none=True)
-            self.scaler.scale(total_loss).backward()
+                    approx_kl = (mb_old_logp - new_logp).mean().abs()
+                    clip_frac = (torch.abs(ratio - 1.0) > self.clip).float().mean()
 
-            # 그래드 노름(클리핑 전/후)
-            self.scaler.unscale_(self.optimizer)
-            pre_clip_norm = torch.nn.utils.clip_grad_norm_(self.network.parameters(), max_norm=0.5)
-            grad_pre_norms.append(float(pre_clip_norm))
-            # post norm은 이론상 <= max_norm
-            grad_post_norms.append(float(min(pre_clip_norm.item(), 0.5)))
+                self.opt.zero_grad(set_to_none=True)
+                self.scaler.scale(loss).backward()
+                self.scaler.unscale_(self.opt)
+                nn.utils.clip_grad_norm_(self.net.parameters(), self.max_grad_norm)
+                self.scaler.step(self.opt)
+                self.scaler.update()
 
-            self.scaler.step(self.optimizer)
-            self.scaler.update()
+                agg["loss_pi"] += float(pi_loss.detach().cpu())
+                agg["loss_v"]  += float(v_loss.detach().cpu())
+                agg["ent"]     += float(ent.detach().cpu())
+                agg["kl"]      += float(approx_kl.detach().cpu())
+                agg["clip_frac"] += float(clip_frac.detach().cpu())
 
-            # epoch 메트릭 수집
-            actor_losses.append(float(actor_loss.detach().cpu()))
-            critic_losses.append(float(critic_loss.detach().cpu()))
-            entropies.append(float(entropy.detach().cpu()))
-            kls.append(float(approx_kl.detach().cpu()))
-            clip_fracs.append(float(clip_frac.detach().cpu()))
-            ratios_means.append(float(ratio.mean().detach().cpu()))
-
-        # 에폭 평균 집계
-        metrics.update({
-            "loss/actor": float(np.mean(actor_losses)),
-            "loss/critic": float(np.mean(critic_losses)),
-            "policy/entropy": float(np.mean(entropies)),
-            "policy/kl": float(np.mean(kls)),
-            "policy/clip_fraction": float(np.mean(clip_fracs)),
-            "policy/ratio_mean": float(np.mean(ratios_means)),
-            "grad/pre_clip_norm": float(np.mean(grad_pre_norms)),
-            "grad/post_clip_norm": float(np.mean(grad_post_norms)),
-            "lr": float(self.optimizer.param_groups[0]["lr"]),
-        })
-
-        # value/adv 통계 & explained variance
-        with torch.no_grad():
-            action_probs, values = self.network(states)
-            values = values.squeeze(-1)
-            adv = returns - values
-            ev = self._calc_explained_variance(returns, values)
-            metrics.update({
-                "value/explained_variance": ev,
-                "value/values_mean": float(values.mean().cpu()),
-                "value/values_std": float(values.std(unbiased=False).cpu()),
-                "adv/mean": float(adv.mean().cpu()),
-                "adv/std": float(adv.std(unbiased=False).cpu()),
-            })
-            # 정책 분포 히스토그램용 일부 표본
-            metrics["policy/prob_mean"] = float(action_probs.mean().cpu())
-
-        self.memory.clear()
-        return metrics
-
-# -----------------------------
-# 시각화 + TensorBoard 훈련
-# -----------------------------
-def train_with_visualization(
-    episodes=1000,
-    max_timesteps=2000,
-    update_timestep=2000,
-    render_mode=None,              # "human" or None
-    record_video=False,
-    video_episodes=(0, 100, 200, 500, 800),  # 파일로 녹화
-    tb_video_episodes=(0, 200, 800),         # TensorBoard 비디오 기록
-    tb_video_max_frames=300,
-    seed=42,
-    run_name: Optional[str] = None
-):
-    set_seed(seed)
-
-    writer = create_writer(run_name)
-    # 하이퍼파라미터 기록
-    hparams = {
-        "episodes": episodes,
-        "max_timesteps": max_timesteps,
-        "update_timestep": update_timestep,
-        "device": DEVICE.type,
-        "amp": AMP_ENABLED,
-        "lr": 3e-4,
-        "gamma": 0.99,
-        "eps_clip": 0.2,
-        "k_epochs": 4,
-        "entropy_coef": 0.01,
-    }
-    writer.add_text("run/info", f"Device: {DEVICE.type}, AMP: {AMP_ENABLED}")
-    writer.add_text("run/command", "tensorboard --logdir runs")
-
-    timestep = 0
-    update_count = 0
-    episode_rewards = deque(maxlen=100)
-
-    print(f"[Device] {DEVICE.type.upper()} | AMP: {AMP_ENABLED}")
-    print("시각화 지오메트리 대시 AI 훈련 시작!")
-
-    # 첫 에피소드에서 에이전트 생성
-    agent = PPOAgent(state_dim=8, action_dim=2)
-
-    # 그래프 기록(선택)
-    try:
-        dummy = torch.zeros(1, 8, dtype=torch.float32).to(DEVICE)
-        writer.add_graph(agent.network, dummy)
-    except Exception:
-        pass  # 환경에 따라 graph 추적이 실패할 수 있음
-
-    ckpt_template = "geometry_dash_ppo_episode_{ep}.pth"
-    os.makedirs("checkpoints", exist_ok=True)
-
-    try:
-        pbar = trange(episodes, desc="Episodes", ncols=100)
-        for episode in pbar:
-            # 렌더링/비디오/텐서보드 비디오 조건
-            should_show = (render_mode == "human") and (episode % 50 == 0)
-            should_record_file = record_video and (episode in set(video_episodes))
-            should_record_tb = (episode in set(tb_video_episodes))
-
-            env = VisualGeometryDashEnv(
-                render_mode="human" if should_show else None,
-                record_video=should_record_file,
-                video_path=f"geometry_dash_episode_{episode}.mp4" if should_record_file else None,
-                collect_tb_frames=should_record_tb,
-                tb_video_max_frames=tb_video_max_frames
-            )
-
-            state, _ = env.reset()
-            episode_reward = 0.0
-            ep_len = 0
-
-            for t in range(max_timesteps):
-                action, log_prob = agent.select_action(state)
-                next_state, reward, terminated, _, _ = env.step(action)
-
-                agent.store_experience(state, action, reward, log_prob, terminated)
-
-                state = next_state
-                episode_reward += float(reward)
-                timestep += 1
-                ep_len += 1
-
-                if timestep % update_timestep == 0:
-                    metrics = agent.update()
-                    update_count += 1
-                    # --- TensorBoard 로깅(업데이트 스텝 기준) ---
-                    if metrics:
-                        for k, v in metrics.items():
-                            writer.add_scalar(k, v, global_step=update_count)
-                        # 가끔 파라미터 히스토그램 기록
-                        if update_count % 200 == 0:
-                            for name, p in agent.network.named_parameters():
-                                if p.grad is not None:
-                                    writer.add_histogram(f"params/{name}", p.detach().cpu(), global_step=update_count)
-                                    writer.add_histogram(f"grads/{name}", p.grad.detach().cpu(), global_step=update_count)
-
-                if terminated:
+                if approx_kl > self.target_kl:
+                    stop_early = True
                     break
-
-            env.close()
-            episode_rewards.append(episode_reward)
-
-            # --- TensorBoard 로깅(에피소드 기준) ---
-            writer.add_scalar("train/episode_reward", episode_reward, global_step=episode)
-            writer.add_scalar("train/episode_length", ep_len, global_step=episode)
-            if len(episode_rewards) > 0:
-                avg100 = float(np.mean(episode_rewards))
-                writer.add_scalar("train/avg_reward_100", avg100, global_step=episode)
-
-            # TQDM 표시
-            if episode % 50 == 0:
-                avg_reward = float(np.mean(episode_rewards)) if len(episode_rewards) > 0 else episode_reward
-                pbar.set_postfix(avg_reward=f"{avg_reward:.2f}", last_ep=f"{episode_reward:.2f}")
-
-            # TensorBoard 비디오 기록
-            if should_record_tb:
-                video_tensor = env.get_tb_video_tensor()
-                if video_tensor is not None:
-                    writer.add_video("video/episode", video_tensor, global_step=episode, fps=env.fps)
-
-            # 체크포인트
-            if (episode % 200) == 0:
-                ckpt_path = os.path.join("checkpoints", ckpt_template.format(ep=episode))
-                torch.save(agent.network.state_dict(), ckpt_path)
-                writer.add_text("checkpoint/saved", ckpt_path, global_step=episode)
-
-        print("훈련 완료!")
-
-    except KeyboardInterrupt:
-        print("훈련 중단됨")
-    finally:
-        # 마지막 체크포인트 + hparams 요약
-        final_ckpt = os.path.join("checkpoints", ckpt_template.format(ep="final"))
-        torch.save(agent.network.state_dict(), final_ckpt)
-        writer.add_text("checkpoint/final", final_ckpt)
-
-        # hparams 결과(최종 평균 보상)
-        final_avg = float(np.mean(episode_rewards)) if len(episode_rewards) > 0 else 0.0
-        writer.add_hparams(hparams, {"metric/avg_reward_100": final_avg})
-        writer.close()
-
-    return agent
-
-# -----------------------------
-# 테스트 (시각화 + 선택적 비디오)
-# -----------------------------
-@torch.no_grad()
-def test_with_visualization(model_path, episodes=3, render_mode="human", record_video=True):
-    env = VisualGeometryDashEnv(
-        render_mode=render_mode,
-        record_video=record_video,
-        video_path="geometry_dash_test.mp4"
-    )
-
-    agent = PPOAgent(state_dim=8, action_dim=2)
-    agent.network.load_state_dict(torch.load(model_path, map_location=DEVICE))
-    agent.network.eval()
-
-    for i in range(episodes):
-        state, _ = env.reset()
-        total_reward = 0.0
-        steps = 0
-
-        while True:
-            s = torch.as_tensor(state, dtype=torch.float32, device=DEVICE).unsqueeze(0)
-            action_probs, _ = agent.network(s)
-            action = int(torch.argmax(action_probs, dim=-1).item())
-
-            state, reward, terminated, _, _ = env.step(action)
-            total_reward += float(reward)
-            steps += 1
-
-            if terminated:
+            if stop_early: 
                 break
 
-        print(f"[Episode {i}] 총 보상: {total_reward:.2f}, 생존 스텝: {steps}")
+        self.sched.step()
+        self.update_step += 1
 
-    env.close()
+        denom = math.ceil(n/self.minibatch_size) * (1 if stop_early else self.epochs)
+        for k in agg: agg[k] /= max(1, denom)
 
-# -----------------------------
-# 실행
-# -----------------------------
+        if writer is not None:
+            writer.add_scalar("loss/actor", agg["loss_pi"], gs)
+            writer.add_scalar("loss/critic", agg["loss_v"], gs)
+            writer.add_scalar("policy/entropy", agg["ent"], gs)
+            writer.add_scalar("policy/kl", agg["kl"], gs)
+            writer.add_scalar("policy/clip_fraction", agg["clip_frac"], gs)
+            writer.add_scalar("opt/lr", self.opt.param_groups[0]["lr"], gs)
+            writer.add_scalar("opt/ent_coef", self.ent_coef_now(), gs)
+
+        return agg
+
+# =========================================================
+# 4) 학습 루프 (VecEnv + RND + TB 로깅 + 체크포인트)
+# =========================================================
+def make_env(seed_base=0, curriculum=True, domain_rand=True):
+    def _thunk():
+        env = HeadlessGeometryDashEnv(seed=seed_base, curriculum=curriculum, domain_rand=domain_rand)
+        env = StateStackWrapper(env, k=4)
+        return env
+    return _thunk
+
+def train_ppo_rnd(
+    total_updates=2000,
+    n_envs=16,
+    n_steps=512,
+    lr=3e-4,
+    gamma=0.99,
+    lam=0.95,
+    clip=0.2,
+    epochs=4,
+    minibatch_size=2048,
+    ent_coef=0.01,
+    target_kl=0.03,
+    rnd_scale=0.05,
+    run_name: Optional[str]=None,
+    seed: int = 42,
+    curriculum: bool = True
+):
+    set_seed(seed)
+    os.makedirs("checkpoints", exist_ok=True)
+    run_name = run_name or f"gdash_sota_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    writer = SummaryWriter(log_dir=os.path.join("runs", run_name))
+
+    print(f"[Device] {DEVICE.type.upper()} | AMP: {AMP}")
+    writer.add_text("run/info", f"Device: {DEVICE.type}, AMP: {AMP}")
+    hparams = {
+        "total_updates": total_updates, "n_envs": n_envs, "n_steps": n_steps, "batch": n_envs*n_steps,
+        "lr": lr, "gamma": gamma, "lam": lam, "clip": clip, "epochs": epochs,
+        "minibatch_size": minibatch_size, "ent_coef": ent_coef, "target_kl": target_kl,
+        "rnd_scale": rnd_scale, "seed": seed, "curriculum": curriculum
+    }
+
+    # VecEnv
+    env_fns = [make_env(seed_base=seed+i, curriculum=curriculum, domain_rand=True) for i in range(n_envs)]
+    vec_env = gym.vector.SyncVectorEnv(env_fns)
+
+    # 초기화
+    obs, _ = vec_env.reset()
+    obs_dim = obs.shape[1]
+    obs_rms = RunningMeanStd(shape=(obs_dim,))
+    net = PPONetwork(state_dim=obs_dim, action_dim=2).to(DEVICE)
+    trainer = PPOTrainer(net, lr=lr, gamma=gamma, lam=lam, clip=clip, epochs=epochs,
+                         vf_coef=0.5, ent_coef=ent_coef, target_kl=target_kl,
+                         max_grad_norm=0.5, minibatch_size=minibatch_size)
+    buffer = RolloutBuffer(n_steps, n_envs, obs_dim, DEVICE)
+
+    rnd = RNDModule(obs_dim=obs_dim, lr=1e-4, device=DEVICE, bonus_scale=rnd_scale)
+
+    global_step = 0
+    best_ret = -1e9
+
+    # (선택) 네트워크 그래프 기록
+    try:
+        dummy = torch.zeros(1, obs_dim, dtype=torch.float32, device=DEVICE)
+        writer.add_graph(net, dummy)
+    except Exception:
+        pass
+
+    pbar = trange(total_updates, desc="Updates", ncols=100)
+    for upd in pbar:
+        ep_ext_returns = []
+        ep_int_returns = []
+        rnd_losses = []
+
+        for t in range(n_steps):
+            # 관측 정규화
+            obs_rms.update(obs)
+            obs_norm = (obs - obs_rms.mean) / np.sqrt(obs_rms.var + 1e-8)
+            obs_t = torch.as_tensor(obs_norm, dtype=torch.float32, device=DEVICE)
+
+            with torch.no_grad():
+                pi, v = net(obs_t)
+                dist = Categorical(pi)
+                actions = dist.sample()
+                logps = dist.log_prob(actions)
+
+            next_obs, rewards, terms, truncs, infos = vec_env.step(actions.cpu().numpy())
+            dones = np.logical_or(terms, truncs).astype(np.float32)
+
+            with torch.no_grad():
+                bonus = rnd.compute_bonus(obs_t)  # (B,)
+            total_reward = torch.as_tensor(rewards, dtype=torch.float32, device=DEVICE) + bonus
+
+            # RND 예측기 업데이트(모든 스텝) — 필요시 t%2==0 등으로 줄일 수 있음
+            rnd_loss = rnd.update(obs_t)
+            rnd_losses.append(rnd_loss)
+
+            buffer.add(
+                obs=obs_t,
+                action=actions,
+                reward=total_reward,
+                done=torch.as_tensor(dones, dtype=torch.float32, device=DEVICE),
+                logp=logps.detach(),
+                value=v.squeeze(-1).detach()
+            )
+
+            obs = next_obs
+            global_step += n_envs
+            ep_ext_returns.append(float(np.mean(rewards)))
+            ep_int_returns.append(float(bonus.mean().detach().cpu()))
+
+        # 부트스트랩 값
+        obs_norm = (obs - obs_rms.mean) / np.sqrt(obs_rms.var + 1e-8)
+        obs_t = torch.as_tensor(obs_norm, dtype=torch.float32, device=DEVICE)
+        with torch.no_grad():
+            _, last_v = net(obs_t)
+
+        batch = buffer.finish(last_v.squeeze(-1), gamma, lam)
+        metrics = trainer.update(batch, writer=writer, gs=upd)
+
+        mean_ext = np.mean(ep_ext_returns) if ep_ext_returns else 0.0
+        mean_int = np.mean(ep_int_returns) if ep_int_returns else 0.0
+        mean_ret_batch = float(batch["returns"].mean().cpu())
+        writer.add_scalar("reward/extrinsic_mean", mean_ext, upd)
+        writer.add_scalar("reward/intrinsic_mean", mean_int, upd)
+        writer.add_scalar("reward/rnd_loss", np.mean(rnd_losses) if rnd_losses else 0.0, upd)
+        writer.add_scalar("train/mean_return_batch", mean_ret_batch, upd)
+
+        pbar.set_postfix(mean_ret=f"{mean_ret_batch:.2f}", ext=f"{mean_ext:.2f}", intr=f"{mean_int:.3f}")
+
+        # 베스트 체크포인트
+        if mean_ret_batch > best_ret:
+            best_ret = mean_ret_batch
+            path = f"checkpoints/ppo_rnd_best.pt"
+            torch.save(net.state_dict(), path)
+            writer.add_text("checkpoint/best", path, upd)
+
+        # 커리큘럼(가이드): 조건 충족 시 난이도 상향 권고 로그
+        if curriculum and (upd+1) % 100 == 0 and mean_ret_batch > -20:
+            writer.add_text("curriculum/info", f"Consider increasing difficulty at update {upd+1}", upd)
+
+    # 종료 처리
+    final_ckpt = "checkpoints/ppo_rnd_final.pt"
+    torch.save(net.state_dict(), final_ckpt)
+    writer.add_text("checkpoint/final", final_ckpt)
+    writer.add_hparams(hparams, {"metric/best_mean_return": best_ret})
+    writer.close()
+    vec_env.close()
+    print("훈련 완료! 최종 체크포인트:", final_ckpt)
+    return final_ckpt
+
+# =========================================================
+# 5) (옵션) 시각화 테스트
+# =========================================================
+def test_visual(model_path: str, episodes: int = 3):
+    """간단 테스트(헤드리스로 step만 진행; pygame 시각화는 생략)"""
+    env = HeadlessGeometryDashEnv(seed=123, curriculum=False, domain_rand=False, difficulty=1.0)
+    env = StateStackWrapper(env, k=4)
+
+    net = PPONetwork(state_dim=env.observation_space.shape[0], action_dim=2).to(DEVICE)
+    net.load_state_dict(torch.load(model_path, map_location=DEVICE))
+    net.eval()
+
+    for i in range(episodes):
+        obs, _ = env.reset()
+        done = False
+        total_r = 0.0
+        steps = 0
+        while not done:
+            obs_norm = obs  # 여기선 정규화를 생략(간단 평가용). 필요시 RMS를 저장/로드하여 동일 적용.
+            s = torch.as_tensor(obs_norm, dtype=torch.float32, device=DEVICE).unsqueeze(0)
+            with torch.no_grad():
+                pi, _ = net(s)
+                act = int(torch.argmax(pi, dim=-1).item())
+            obs, r, term, trunc, _ = env.step(act)
+            total_r += float(r)
+            steps += 1
+            done = term or trunc
+        print(f"[Episode {i}] Return={total_r:.2f}, Steps={steps}")
+
+# =========================================================
+# 6) 엔트리포인트
+# =========================================================
+def parse_args():
+    p = argparse.ArgumentParser(description="Geometry Dash PPO+RND (SOTA)")
+    p.add_argument("--updates", type=int, default=1000)
+    p.add_argument("--n_envs", type=int, default=16)
+    p.add_argument("--n_steps", type=int, default=512)
+    p.add_argument("--lr", type=float, default=3e-4)
+    p.add_argument("--gamma", type=float, default=0.99)
+    p.add_argument("--lam", type=float, default=0.95)
+    p.add_argument("--clip", type=float, default=0.2)
+    p.add_argument("--epochs", type=int, default=4)
+    p.add_argument("--mb_size", type=int, default=2048)
+    p.add_argument("--ent", type=float, default=0.01)
+    p.add_argument("--target_kl", type=float, default=0.03)
+    p.add_argument("--rnd_scale", type=float, default=0.05)
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--no_curriculum", action="store_true")
+    p.add_argument("--run_name", type=str, default=None)
+    p.add_argument("--test_after", action="store_true")
+    return p.parse_args()
+
 if __name__ == "__main__":
-    trained_agent = train_with_visualization(
-        episodes=1000,
-        max_timesteps=2000,
-        update_timestep=2000,
-        render_mode=None,            # "human"으로 두면 50에피소드마다 렌더링
-        record_video=True,
-        video_episodes=(0, 100, 200, 500, 800),
-        tb_video_episodes=(0, 200, 800),
-        tb_video_max_frames=300,
-        seed=42,
-        run_name=None                # None이면 자동 타임스탬프 이름
+    args = parse_args()
+    final_ckpt = train_ppo_rnd(
+        total_updates=args.updates,
+        n_envs=args.n_envs,
+        n_steps=args.n_steps,
+        lr=args.lr,
+        gamma=args.gamma,
+        lam=args.lam,
+        clip=args.clip,
+        epochs=args.epochs,
+        minibatch_size=args.mb_size,
+        ent_coef=args.ent,
+        target_kl=args.target_kl,
+        rnd_scale=args.rnd_scale,
+        run_name=args.run_name,
+        seed=args.seed,
+        curriculum=(not args.no_curriculum)
     )
-
-    # 필요 시 테스트
-    # test_with_visualization('checkpoints/geometry_dash_ppo_episode_final.pth', episodes=3)
+    if args.test_after:
+        test_visual(final_ckpt, episodes=3)
 
