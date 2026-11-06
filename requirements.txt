@@ -1,4 +1,4 @@
-tensorflow ==2.11.1
+tensorflow ==2.12.1
 pyautogui
 numpy
 opencv-python
